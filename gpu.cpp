@@ -1,95 +1,14 @@
 #include <CL/cl2.hpp>
 #include <iostream>
-#define log_msg(x) std::cout << x << "\n"
 #define DTYPE float
-#include "argparse.hpp"
 
-#include <SFML/Graphics.hpp>
-#include <SFML/OpenGL.hpp>
-#define random() ((double) rand() / (RAND_MAX))
+
+#include "argparse.hpp"
+#include "compile_sources.hpp"
+// #include <SFML/Graphics.hpp>
+// #include <SFML/OpenGL.hpp>
 #include <cmath>
 
-bool inRange(int start, int end, int x) {
-    bool b1 = x >= start;
-    bool b2 = x <= end;
-    return b1 && b2;
-}
-
-std::string load_source() {
-}
-
-struct pos
-{
-    double offsetX = 0;
-    double offsetY = 0;
-    double zoom = 40;
-};
-
-sf::Vector2<float> toPixels(pos position, float x, float y) {
-    float centerX = (800 / 2) + position.offsetX;
-    float centerY = (600 / 2) + position.offsetY;
-
-    return sf::Vector2f(
-        centerX + x * position.zoom,
-        centerY - y * position.zoom
-    );
-}
-
-sf::Vector2f toCartesian(pos position, sf::Vector2i mpos) {
-    float centerX = (800 / 2) + position.offsetX;
-    float centerY = (600 / 2) + position.offsetY;
-
-    return sf::Vector2f(
-        (mpos.x - centerX) / position.zoom,
-       -(mpos.y - centerY) / position.zoom        
-    );
-
-}
-
-// g++ gpu.cpp -o a.out -lOpenCL
-
-cl::Device get_device(int platform_index=0, int device_index=0) {
-    using std::vector;
-    vector<cl::Platform> platforms; cl::Platform::get(&platforms);
-    if (platforms.size() == 0) {
-        log_msg("No Supported OpenCL implementation found");
-        exit(1);
-    }
-
-
-    if (!inRange(0, platforms.size(), platform_index)) {
-        log_msg("Index \"" + std::to_string(platform_index) + "\" out of Bounds (at Platform selection).");
-        exit(1);
-    }
-    
-    cl::Platform selected_platform = platforms[platform_index];
-    vector<cl::Device> devices;
-
-    selected_platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
-
-    if (devices.size() == 0) {
-        std::cout << "Platform \"" << selected_platform.getInfo<CL_PLATFORM_NAME>() << "\" has no supported devices.\n";
-        exit(1);
-    }
-
-    if (!inRange(0, devices.size(), device_index)) {
-        std::cout << "Out of bounds index for " << "Platform \"" << selected_platform.getInfo<CL_PLATFORM_NAME>() << "";
-        exit(1);
-    }
-
-    cl::Device default_device = devices[device_index];
-
-    std::cout << "Using device \"" << default_device.getInfo<CL_DEVICE_NAME>() << "\" by " << default_device.getInfo<CL_DEVICE_VENDOR>() << "\n" ;
-    return default_device;
-}
-
-
-float dist2d(float x0, float x1) {
-    if (x1 > x0) 
-        return abs(x1 - x0);
-    else
-        return -abs(x1 - x0);
-}
 
 
 int main() {
@@ -140,31 +59,41 @@ int main() {
 
     glOrtho(0, width, height, 0, -1, 1);
 
+    float velocity = 1.0f;
 
     while (running)
     {
         while (window.pollEvent(event)) { if (event.type == sf::Event::Closed) { running = false; } }
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+            velocity += 1.0f;
+            printf("%.2f\n", velocity);
+        }    
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
+            velocity += 100.0f;
+            printf("%.2f\n", velocity);
+        }
+
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
 
             sf::Vector2i mpos =  sf::Mouse::getPosition();
             sf::Vector2f cmpos =  toCartesian(position, mpos);
 
-            position.zoom += 1.0f;
+            position.zoom += velocity;
 
             sf::Vector2f cmpos_2 =  toCartesian(position, mpos);
             
-            position.offsetX += dist2d(cmpos.x, cmpos_2.x) * position.zoom;
+            // position.offsetX += dist2d(cmpos.x, cmpos_2.x) * position.zoom;
+            position.offsetY += dist(cmpos.y, cmpos_2.y) * position.zoom;
+            // position.offsetX += -dist(cmpos.x, cmpos_2.x) * position.zoom; 
 
-            sf::Vector2f cmpos_3 = toCartesian(position, mpos);
 
-            printf("Old: %.2f, New: %.2f, Final: %.2f\n", cmpos.x, cmpos_2.x, cmpos_3.x);
+            // sf::Vector2f cmpos_3 = toCartesian(position, mpos);
 
-            // position.offsetY += dist2d(cmpos_2.x, cmpos.x) * position.zoom;
-            // position.offsetX += dist2d(cmpos_2.y, cmpos.y) * position.zoom;
+            printf("Old: %.3f New: %.3f Expected: %.3f Actual: %.3f\n", cmpos.y, cmpos_2.y, cmpos_2.y + dist(cmpos.y, cmpos_2.y), toCartesian(position, mpos).y);
 
 
         } 
@@ -177,21 +106,20 @@ int main() {
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-            position.offsetY += 10;
+            position.offsetX += 10;
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-            position.offsetY -= 10;
+            position.offsetX -= 10;
         }
 
 
-
-        mandel.setArg(0, GPU_PIXELS);
-        mandel.setArg(1, GPU_SMOOTH);
-        mandel.setArg(2, position.offsetY);
-        mandel.setArg(3, position.offsetX);
-        mandel.setArg(4, position.zoom);
-        mandel.setArg(5, 50);
+        mandel.setArg(0, GPU_PIXELS);           //      __global float *iter,        
+        mandel.setArg(1, GPU_SMOOTH);           //      __global float *SMOOTH,
+        mandel.setArg(2, position.offsetX);     //     const double offsetX, 
+        mandel.setArg(3, position.offsetY);      //     const double offsetY, 
+        mandel.setArg(4, position.zoom);        //     const double zoom,
+        mandel.setArg(5, 50);                   //     const int iterations)
 
         queue.enqueueNDRangeKernel(mandel, cl::NullRange, cl::NDRange(width, height), cl::NullRange);
         queue.enqueueReadBuffer(GPU_PIXELS, CL_TRUE, 0, BUFFER_SIZE, CPU_COPY_PIXELS);
@@ -212,12 +140,7 @@ int main() {
             }
 
         glEnd();
-
-
-        // exit(1);
-
         window.display();
     }
-
     return 0;
 }

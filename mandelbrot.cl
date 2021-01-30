@@ -22,7 +22,8 @@ __kernel void mandel(
     double centerX = initialCenterX + offsetX;
     double centerY = initialCenterY + offsetY;
 
-    double x = (col - centerX) / zoom, y =  -(row - centerY) / zoom;
+    double x = (col - centerX) / zoom;
+    double y =  -(row - centerY) / zoom;
 
     struct complex z, _z;
     z.real = 0, _z.real = 0;  
@@ -51,9 +52,6 @@ __kernel void mandel(
 
     int tid = row * columns + col;
 
-    // if (col == 700) {
-        // printf("This is col 700");
-    // }
 
     float smooth = local_iterations + 1 - log(log(sqrt(a_2 + b_2)) / 2);
     iter[tid] = ((float)local_iterations / (float)iterations);
