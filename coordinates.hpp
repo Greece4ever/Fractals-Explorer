@@ -1,7 +1,16 @@
+/*
+    CPU implementation of all coordinate transformations 
+    in 2D Space (ie Cartesian Coordinate mapping, offsets, zoom)
+*/
+
 #ifndef SFML_GRAPHICS_HPP
     #include <SFML/Graphics.hpp>
     #include <SFML/OpenGL.hpp>
 #endif
+
+namespace dim {
+    int width, height;
+}
 
 struct pos
 {
@@ -10,9 +19,11 @@ struct pos
     double zoom = 40;
 };
 
+
 sf::Vector2<float> toPixels(pos position, float x, float y) {
-    float centerX = (800 / 2) + position.offsetX;
-    float centerY = (600 / 2) + position.offsetY;
+    /* Cartesian cords to pixels */
+    float centerX = (dim::width / 2) + position.offsetX;
+    float centerY = (dim::height / 2) + position.offsetY;
 
     return sf::Vector2f(
         centerX + x * position.zoom,
@@ -21,8 +32,9 @@ sf::Vector2<float> toPixels(pos position, float x, float y) {
 }
 
 sf::Vector2f toCartesian(pos position, sf::Vector2i mpos) {
-    float centerX = (800 / 2) + position.offsetX;
-    float centerY = (600 / 2) + position.offsetY;
+    /* pixel cords to cartesian */
+    float centerX = (dim::width / 2) + position.offsetX;
+    float centerY = (dim::height / 2) + position.offsetY;
 
     return sf::Vector2f(
         (mpos.x - centerX) / position.zoom,

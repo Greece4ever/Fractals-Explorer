@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas width="800" height="600" id="canvas">
+
+    </canvas>
+    <div id="errors"></div>
+    
+</body>
+</html>
+<script>
+    let canvas = document.getElementById("canvas");
+    let gl = canvas.getContext("webgl2");
+    let err_div = document.getElementById("errors");
+</script>
+<script>
+    const vShader = `
+    #version 300 es
+
+    in vec2 pos;
+
+    void main() {
+        gl_Position = vec4(pos, 0.0, 1.0);
+    }
+`.trim();
+
+const fShader = `
+    #version 300 es
+    precision highp float;
+
+    out vec4 color;
+    uniform float colorX;
+
+    void main() {
+        color = vec4(colorX, 0.3, 1.0, 1.0);
+    }
+`.trim();
+
+    let a = new XMLHttpRequest();
+    a.addEventListener("progress", (e) => {
+        if (e.lengthComputable) {
+            console.log(e.loaded / e.total * 100);
+        }
+    })
+    a.open("GET", "/web/fragment.glsl");
+    a.send();
+
+    a.addEventListener("load", (e) => {
+        console.log(a.response);
+    })
+
+</script>
+<script name="lookup tables">
+let errors = {};
+let types = {};
+
+errors[gl.NO_ERROR]             = "GL_NO_ERR"
+errors[gl.INVALID_ENUM]         = "GL_INVALID_ENUM";
+errors[ gl.INVALID_VALUE ]      = "GL_INVALID_VALUE";
+errors[ gl.INVALID_OPERATION ]  = "GL_INVALID_OPERATION";
+errors[ gl.STACK_OVERFLOW ]     = "GL_STACK_OVERFLOW";
+errors[ gl.STACK_UNDERFLOW ]    = "GL_STACK_UNDERFLOW";
+errors[ gl.OUT_OF_MEMORY ]      = "GL_OUT_OF_MEMORY";
+errors[ gl.INVALID_FRAMEBUFFER_OPERATION ] = "GL_INVALID_FRAMEBUFFER_OPERATION";
+errors[ gl.CONTEXT_LOST ] = "GL_CONTEXT_LOST";
+errors[ gl.TABLE_TOO_LARGE1 ] = "GL_TABLE_TOO_LARGE1";
+
+types[gl.VERTEX_SHADER] = "gl.VERTEX_SHADER";
+types[gl.FRAGMENT_SHADER] = "gl.FRAGMENT_SHADER"; 
+</script>
+<script src="./gl.js"></script>
