@@ -1,65 +1,3 @@
-const sizeof_float = 32 / 8;
-const triangle_vertices = 3;
-
-let Vertices = [
-    -1, -1,
-    1, -1,
-    1, 1,
-
-    1, 1,
-    -1, 1,
-    -1, -1
-
-    // 0, 1,
-];
-
-
-
-var compilationLog, webgl_console;
-
-const style = (str) => {
-    str = str.replaceAll("ERROR", "<b style=\"color: red\">ERROR</b>");
-    str = str.replaceAll("SUCCESS", "<b style=\"color: green\">SUCCESS</b>");
-
-    return str;
-}
-
-const getHardWareInfo = () => {
-
-    function getUnmaskedInfo(gl) {
-        var unMaskedInfo = {
-          renderer: '',
-          vendor: ''
-        };
-  
-        var dbgRenderInfo = gl.getExtension("WEBGL_debug_renderer_info");
-        if (dbgRenderInfo != null) {
-          unMaskedInfo.renderer = gl.getParameter(dbgRenderInfo.UNMASKED_RENDERER_WEBGL);
-          unMaskedInfo.vendor = gl.getParameter(dbgRenderInfo.UNMASKED_VENDOR_WEBGL);
-        }
-  
-        return unMaskedInfo;
-      }
-
-    let info = getUnmaskedInfo(gl);
-    return {
-        "User Agent": navigator.userAgent,
-        "CPU Cores" : navigator.hardwareConcurrency,
-        "WEBGL Renderer" : gl.getParameter(gl.RENDERER),
-        "Browser Vendor": gl.getParameter(gl.VENDOR),
-        "GPU Family" : info.renderer,
-        "GPU Vendor" : info.vendor
-    }
-}
-
-let consoleError = (header, str_err) => {
-    err_div.innerHTML += `<pre> ${header}<hr>${style(str_err)}</pre>`
-}
-
-let console_ = (str) => {
-    webgl_console.innerHTML += `${style(str)}\n`
-}
-
 function glCall(line) {
     let error = gl.getError();
     let status = "ERROR";
@@ -69,109 +7,159 @@ function glCall(line) {
     console_(`[${status}] OpenGL ${error} (${errors[error]}) at line <b style="color: blue">${line}</b>`);
 }
 
+function attachListeners() {
+    window.addEventListener("keydown", (e) => {
+        held_keys[e.key.toLowerCase()] = true;
+    })
 
-if (!gl) {
-    consoleError("Initialising Context...", 
-    `ERROR: Webgl2 Not supported by Browser`)
-} 
-else {
-    consoleError("Initialising Context...", `SUCCESS: Initialised Webgl2 Context`)
+    window.addEventListener("keyup", (e) => {
+        held_keys[e.key.toLowerCase()] = false;
+    })
 }
 
-let info = getHardWareInfo();
+function isKeyPressed(key) {
+    let cached = held_keys[key];
+    return cached === undefined ? false : cached;
+}
 
-let s ="";
-for (let item in info) {
-    s += `<b style="color:blue">${item}:\t</b>`;
-    s += `<b>${info[item]}</b>\n`
-} 
 
-consoleError("Hardware Info", s);
-
-const createShader = (type, source_str) => {
-    let shader = gl.createShader(type);
-    gl.shaderSource(shader, source_str);
-    gl.compileShader(shader);
-    let compiled = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
-    console.log(compiled);
-    if (!compiled) {
-        console.log(type);
-        compilationLog = gl.getShaderInfoLog(shader);
-        consoleError(`Compilation of shader <b style='color: green'>${types[type]}</b> failed`, compilationLog);
-        return false;
+class Timer {
+    constructor() {
+        this.time = 0;
     }
-    return shader;
-}
 
-const createProgram = (vertex_src, fragment_src) => {
-    let program = gl.createProgram();
-        let v_shader = createShader(gl.VERTEX_SHADER,   vertex_src);
-        let f_shader = createShader(gl.FRAGMENT_SHADER, fragment_src);
-    gl.attachShader(program, v_shader);
-    gl.attachShader(program, f_shader);
+    toSeconds(miliseconds) {
+        return miliseconds * 0.001;
+    }    
+    
+    restart() {
+        this.time = performance.now();
+    }   
 
-    gl.linkProgram(program);
-        gl.detachShader(program, v_shader);
-        gl.detachShader(program, f_shader);    
-
-        gl.deleteShader(v_shader);
-        gl.deleteShader(f_shader);
-
-    if ( !gl.getProgramParameter( program, gl.LINK_STATUS) ) {
-        var info = gl.getProgramInfoLog(program);
-        consoleError('Could not compile WebGL program. ', info);
+    getMiliseconds() {
+        return performance.now() - this.time;
     }
-    return program;
-}
 
-let program = createProgram(vShader, fShader);
-gl.useProgram(program);
-consoleError("WEBGL", "");
-err_div.innerHTML += "<pre id=\"console\"></pre>"
-webgl_console = document.getElementById("console");
-
-let VAO = gl.createVertexArray();
-    gl.bindVertexArray(VAO);
-
-glCall(new Error().lineNumber);
-
-let VBO = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Vertices), gl.STATIC_DRAW);
-
-glCall(new Error().lineNumber);
-
-
-let position = gl.getAttribLocation(program, "pos");
-    gl.enableVertexAttribArray(position);
-
-glCall(new Error().lineNumber);
-
-gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 2 * sizeof_float, 0);
-
-glCall(new Error().lineNumber);
-
-
-let color = gl.getUniformLocation(program, "colorX");
-
-window.addEventListener("keypress", (e) => {
-    if(e.key == "Enter") {
-        gl.uniform1f(color, Math.random());
+    getElapsedTime() {
+        return this.toSeconds(performance.now() - this.time);
     }
-})
+}
 
-function loop() {
-    gl.clear(gl.COLOR_BUFFER_BIT)
-    gl.drawArrays(gl.TRIANGLES, 0, 2 * triangle_vertices);
-    window.requestAnimationFrame(loop);
+let offset = {"x" : 850.0, "y" : 250.0, "zoom": 100.0, "velocity" : 500.0, "zoomVelocity" : 100.0, "runVelocity" : 200.0};
+// let velocity = 500.0;
+
+
+var offsetLocation, zoomLocation;
+
+let FPS_COUNTER = document.getElementById("fps_counter");
+
+function OrbitControl(timer) {
+    let extraVelocity = 0.0;
+    if (isKeyPressed("shift")) {
+        extraVelocity = offset.runVelocity;
+    }
+
+    let velocity = offset.velocity + extraVelocity;
+    let zoomVelocity = offset.zoomVelocity + extraVelocity;
+
+    if (isKeyPressed("a")) {
+        offset.x -= velocity * timer.getElapsedTime();
+    }  
+
+    if (isKeyPressed("d")) {
+        offset.x += velocity * timer.getElapsedTime();
+    }
+
+    if (isKeyPressed("w")) {
+        offset.y += velocity * timer.getElapsedTime();
+    }
+
+    if (isKeyPressed("s")) {
+        offset.y -= velocity * timer.getElapsedTime();
+    }
+
+    if (isKeyPressed("z")) {
+        offset.zoom += zoomVelocity * timer.getElapsedTime();
+    }
+
+    if (isKeyPressed("x")) {
+        offset.zoom -= zoomVelocity * timer.getElapsedTime();
+    }
+
+    gl.uniform2f(offsetLocation, offset.x, offset.y);
+    gl.uniform1f(zoomLocation, offset.zoom);
 }
 
 
-loop();
+var program, VAO, VBO;
+var held_keys = [];
 
-// gl.drawArrays(gl.TRIANGLES, 0, 2 * triangle_vertices);
-// gl.clear(gl.COLOR_BUFFER_BIT)
-
-// glCall(new Error().lineNumber);
+var frames = 0;
+let fpsTimer = new Timer();
 
 
+function init() {
+    printInfo();
+        consoleError("WEBGL", "");
+        err_div.innerHTML += "<pre id=\"console\"></pre>"
+        webgl_console = document.getElementById("console");
+    
+    const html = Prism.highlight(fShader, Prism.languages.glsl, 'glsl');
+
+    document.getElementById("code").innerHTML = "<pre>" + html + "</pre>";
+
+    program = createProgram(vShader, fShader);
+    gl.useProgram(program);
+
+    VAO = gl.createVertexArray();
+        gl.bindVertexArray(VAO);
+        glCall(new Error().lineNumber);
+
+
+    VBO = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Vertices), gl.STATIC_DRAW);
+        glCall(new Error().lineNumber);
+
+    let position = gl.getAttribLocation(program, "pos");
+        gl.enableVertexAttribArray(position);
+        glCall(new Error().lineNumber);
+
+    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 2 * sizeof_float, 0);
+        glCall(new Error().lineNumber);
+
+    // Uniforms
+    resolution_loc   = gl.getUniformLocation(program, "u_resolution");
+    offsetLocation = gl.getUniformLocation(program, "offset");
+    zoomLocation   = gl.getUniformLocation(program, "zoom");
+
+    
+
+    gl.uniform2f(resolution_loc, canvas.width, canvas.height);
+    gl.uniform2f(offsetLocation, 0, 0);
+    gl.uniform1f(zoomLocation, 100.0);
+
+    timer = new Timer();    
+
+    function loop() {
+        gl.clear(gl.COLOR_BUFFER_BIT)
+        gl.drawArrays(gl.TRIANGLES, 0, 2 * triangle_vertices);
+        OrbitControl(timer, offsetLocation);
+        
+        if (fpsTimer.getMiliseconds() >= 1000) {
+            FPS_COUNTER.innerText = `FPS: ${frames}`;
+            frames = 0;
+            fpsTimer.restart();            
+        }
+        frames += 1;
+        timer.restart();
+        window.requestAnimationFrame(loop);
+    }
+
+    
+    attachListeners();
+    timer.restart();    
+    fpsTimer.restart();
+
+    loop();
+}

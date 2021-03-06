@@ -4,74 +4,25 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism.css " rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-dark.css" rel="stylesheet">
     <title>Document</title>
 </head>
-<body>
+<body style="background-color: black;">
+    <div style="font-family: 'Courier New', Courier, monospace; font-size: 25px; position: absolute; margin-left: 10px; margin-top: 10px; color: white;" id="fps_counter">FPS: 0</div>
+    <div id="res_div" style="overflow: auto; position: absolute;width: 800px; height: 600px; resize: horizontal; background-color: transparent"></div>
     <canvas width="800" height="600" id="canvas">
 
     </canvas>
-    <div id="errors"></div>
-    
+    <div style="background-color: rgb(0, 0, 0); border: 10px hidden green; padding: 10px;" id="errors"></div>
+    <div style="color: white;" id="code"></div>
 </body>
 </html>
-<script>
-    let canvas = document.getElementById("canvas");
-    let gl = canvas.getContext("webgl2");
-    let err_div = document.getElementById("errors");
-</script>
-<script>
-    const vShader = `
-    #version 300 es
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-clike.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-c.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-glsl.js" defer></script>
 
-    in vec2 pos;
+<script src="./gl.js" defer></script>
+<script src="./base.js" defer></script>
 
-    void main() {
-        gl_Position = vec4(pos, 0.0, 1.0);
-    }
-`.trim();
-
-const fShader = `
-    #version 300 es
-    precision highp float;
-
-    out vec4 color;
-    uniform float colorX;
-
-    void main() {
-        color = vec4(colorX, 0.3, 1.0, 1.0);
-    }
-`.trim();
-
-    let a = new XMLHttpRequest();
-    a.addEventListener("progress", (e) => {
-        if (e.lengthComputable) {
-            console.log(e.loaded / e.total * 100);
-        }
-    })
-    a.open("GET", "/web/fragment.glsl");
-    a.send();
-
-    a.addEventListener("load", (e) => {
-        console.log(a.response);
-    })
-
-</script>
-<script name="lookup tables">
-let errors = {};
-let types = {};
-
-errors[gl.NO_ERROR]             = "GL_NO_ERR"
-errors[gl.INVALID_ENUM]         = "GL_INVALID_ENUM";
-errors[ gl.INVALID_VALUE ]      = "GL_INVALID_VALUE";
-errors[ gl.INVALID_OPERATION ]  = "GL_INVALID_OPERATION";
-errors[ gl.STACK_OVERFLOW ]     = "GL_STACK_OVERFLOW";
-errors[ gl.STACK_UNDERFLOW ]    = "GL_STACK_UNDERFLOW";
-errors[ gl.OUT_OF_MEMORY ]      = "GL_OUT_OF_MEMORY";
-errors[ gl.INVALID_FRAMEBUFFER_OPERATION ] = "GL_INVALID_FRAMEBUFFER_OPERATION";
-errors[ gl.CONTEXT_LOST ] = "GL_CONTEXT_LOST";
-errors[ gl.TABLE_TOO_LARGE1 ] = "GL_TABLE_TOO_LARGE1";
-
-types[gl.VERTEX_SHADER] = "gl.VERTEX_SHADER";
-types[gl.FRAGMENT_SHADER] = "gl.FRAGMENT_SHADER"; 
-</script>
-<script src="./gl.js"></script>
