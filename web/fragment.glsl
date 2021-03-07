@@ -11,12 +11,12 @@ uniform float ROTATION;
 
 
 vec2 toCartesian(in vec2 pixel_pos) {
-    float centerX = width  / 2.0  - offset.x;
-    float centerY = height / 2.0 - offset.y;
+    float centerX = (width  / 2.0)  - offset.x;
+    float centerY = (height / 2.0)  - offset.y;
 
     return vec2(
-         (pixel_pos.x  - centerX) / zoom, // (pixel_pos.x - width)  / zoom,
-        -(pixel_pos.y - centerY) / zoom // -(pixel_pos.y - height) / zoom
+         (pixel_pos.x - centerX) / zoom, 
+        -(pixel_pos.y - centerY) / zoom  
     );
 }
 

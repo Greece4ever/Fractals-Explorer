@@ -17,7 +17,7 @@ disableError();
     const style = (str) => {
         str = str.replaceAll("ERROR", "<b style=\"color: red\">ERROR</b>");
         str = str.replaceAll("SUCCESS", "<b style=\"color: #70e370\">SUCCESS</b>");
-        str = str.replaceAll("INFO", "<b style=\"color: #2626bf\">INFO</b>");
+        str = str.replaceAll("INFO", "<b style=\"color: #6290e0\">INFO</b>");
         return str;
     }
 
@@ -50,8 +50,8 @@ disableError();
         return {
             "User Agent": navigator.userAgent,
             "CPU Cores" : navigator.hardwareConcurrency,
-            "WEBGL Renderer" : gl.getParameter(gl.RENDERER),
-            "Browser Vendor": gl.getParameter(gl.VENDOR),
+            "WebGL Renderer" : gl.getParameter(gl.RENDERER),
+            "WebGL Vendor": gl.getParameter(gl.VENDOR),
             "GPU Family" : info.renderer,
             "GPU Vendor" : info.vendor
         }
@@ -62,7 +62,7 @@ disableError();
 
         let s = "";
         for (let item in info) {
-            s += `<b style="color:#2626bf">${item}:\t</b>`;
+            s += `<b style="color:#6290e0">${item}:\t</b>`;
             s += `<b style="color: white">${info[item]}</b>\n`
         } 
 
@@ -201,11 +201,24 @@ a.send();
 
 let res_div = document.getElementById("res_div");
 res_div.style.width = `${window.innerWidth - 30}px`;
+
 let resolution_loc;
+
+class Vector {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+var mid = new Vector(canvas.width / 2.0, canvas.height / 2.0);
 
 function resizef() {
     let width  = Number( res_div.style.width.split("px", 1)[0]  );
     let height = Number( res_div.style.height.split("px", 1)[0] );
+    
+    mid.x = width  / 2.0;
+    mid.y = height / 2.0;
 
     canvas.width  = width;
     canvas.height = height;

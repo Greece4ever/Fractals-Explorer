@@ -4,10 +4,8 @@ class Vector:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-
     def __str__(self):
-        return f'({x}, {y})'
-
+        return f'({self.x}, {self.y})'
 
 WIDTH, HEIGHT = 800, 600 
 
@@ -40,31 +38,14 @@ def to_cartesian(pX, pY) -> tuple:
         -(pY - center.y) / zoom 
     )
  
-# prev_cmpos.y = -(pY - center.y) / zoom
-# (prev_cmpos.y * zoom) = -(pY - center.y)
-# -(prev_cmpos.y * zoom)= (pY - center.y)
-# -(prev_cmpos.y * zoom) - pY = -center.y
-# -(-(prev_cmpos.y * zoom) - pY) = center.y
-# -(-(prev_cmpos.y * zoom) - pY) = mid.y + offset.y
-# offset.y = -(-(prev_cmpos.y * zoom) - pY) - mid.y
-
-
-# prev_cmpos.x  = (pX - center.x) / zoom
-# (prev_cmpos.x * zoom)  =  (pX - center.x)
-# (prev_cmpos.x * zoom) - pX = -center.x
-# -((prev_cmpos.x * zoom) - pX) = center.x
-# -((prev_cmpos.x * zoom) - pX) =  mid.x + offset.x
-# -((prev_cmpos.x * zoom) - pX) - mid.x = offset.x
-
-
 color = (75, 125, 255) 
  
 # Some sample shape to understand the transformation
 def draw_coordinates():
-    pygame.draw.line(screen, color, to_pixels(0, 0), to_pixels(40, 0))
-    pygame.draw.line(screen, color, to_pixels(0, 0), to_pixels(-40, 0))
-    pygame.draw.line(screen, color, to_pixels(0, 0), to_pixels(0, 40))
-    pygame.draw.line(screen, color, to_pixels(0, 0), to_pixels(0, -40))
+    pygame.draw.line(screen, color, to_pixels(0, 0), to_pixels( 40,   0   ))
+    pygame.draw.line(screen, color, to_pixels(0, 0), to_pixels( -40,  0   ))
+    pygame.draw.line(screen, color, to_pixels(0, 0), to_pixels(  0,   40  ))
+    pygame.draw.line(screen, color, to_pixels(0, 0), to_pixels(  0,  -40  ))
  
 
 pos = [0, 0]

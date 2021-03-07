@@ -5,124 +5,58 @@
 #include <cmath>
 #define print(x) std::cout << x<< "\n"
 
-sf::Vector2f cart(sf::Vector2f pos);
-sf::Vector2f toCartesian(sf::Vector2f pos);
-
-float ZOOM = 50.0;
-sf::Vector2f offset(0, 0);
-
-class Line {
-    // sf::Vector2f line[2];
-    sf::Vertex line[2];
-    sf::Vector2f P0;
-    sf::Vector2f P1;
+sf::Vector2f toCartesian(float pX, float pY);
+sf::Vector2f toPixels(float x, float y);
 
 
-    float radToDeg(float rad) {
-        return (180 / 3.14159) * rad;
-    }
+float zoom = 0.5f;
+sf::Vector2f offset(0.0f, 0.0f);
+sf::Vector2f mid((float)WIDTH / 2.0f, (float)HEIGHT / 2.0f);
 
-    public:
-        float length;
-
-        Line(sf::Vector2f P0, sf::Vector2f P1) {
-            this->P0 = P0; // origin
-            this->P1 = P1;
-            this->length = getLength();
-        }
-
-        Line() = default;
-
-        void render(sf::RenderWindow& window) {
-            line[0].position = cart(P0);
-            line[1].position = cart(P1);
-
-            window.draw(this->line, 2, sf::Lines);
-        }
-
-        float getLength() {
-            float x = this->P1.x;
-            float y = this->P1.y;
-
-            return sqrt(x * x + y * y);
-        }
-
-        void setRotation(float angle) {
-            float sin_ = sin( angle );
-            float cos_ = cos( angle );
-            // printf("%.2f\n", cos_);
-            float X = P1.x * cos_ - P1.y * sin_;
-            float Y = P1.x * sin_ + P1.y * cos_;
-
-            
-
-            // float y1 = sin(angle) * length;
-            // float x1 = cos(angle) * length;
-            P1 = sf::Vector2f(X, Y);
-        }
-};
-
-
-class Rect {
-    Line lines[4];
-
-    public:
-        Rect(float x, float y, sf::Vector2f len) {
-            lines[0] = Line(sf::Vector2f(x, y), sf::Vector2f(x + len.x, y));
-            lines[1] = Line(sf::Vector2f(x + len.x, y), sf::Vector2f(x + len.x, y - len.y));
-            lines[2] = Line(sf::Vector2f(x + len.x, y - len.y), sf::Vector2f(x, y - len.y));
-            lines[3] = Line(sf::Vector2f(x, y - len.y), sf::Vector2f(x, y));
-        }
-
-
-    void render(sf::RenderWindow& window) {
-        for (char i=0; i < 4; i++) {
-            lines[i].render(window);
-        }
-    }
-
-};
-
-sf::Vector2f cart(sf::Vector2f pos) {
-    float& x = pos.x;
-    float& y = pos.y;
-    return sf::Vector2f( (WIDTH / 2 + offset.x) + x * ZOOM, (HEIGHT / 2 + offset.y) - y * ZOOM);
-}
-
-// wX = (WIDTH / 2 + offset.x) + x * ZOOM
-// wX - (WIDTH / 2 + offset.x) = x * ZOOM
-
-// wY = (HEIGHT / 2 + offset.y) - y * ZOOM
-// wY - (HEIGHT / 2 + offset.y) = - y * zoom
-// (wY - (HEIGHT / 2 + offset.y)) / ZOOM = -y
-
-
-sf::Vector2f toCartesian(sf::Vector2f pos) {
-    float& wX = pos.x;
-    float& wY = pos.y;
-
-    std::cout << "wXY: " << wX << " " << wY << "\n";
+sf::Vector2f toPixels(float x, float y) {
+    sf::Vector2f center(
+        mid.x + offset.x,
+        mid.y + offset.y
+    );
 
     return sf::Vector2f(
-        (wX - (WIDTH / 2 + offset.x)) / ZOOM,
-       -(wY - (HEIGHT / 2 + offset.y)) / ZOOM
+        center.x + x * zoom,
+        center.y - y * zoom
     );
 }
 
-// cX = (WIDTH / 2 + offset.x)
+sf::Vector2f toCartesian(float pX, float pY) {
+    sf::Vector2f center(
+        mid.x + offset.x,
+        mid.y + offset.y
+    );
 
-// cmpos.x = (wX - (WIDTH / 2 + offset.x)) / ZOOM,
-
-// (cmpos.x * ZOOM) = wX - cX
-// (cmpos.x * ZOOM) - wX = -cX
-// cX = -((cmpos.x * ZOOM) - wX)
-// (WIDTH / 2 + offset.x) = -((cmpos.x * ZOOM) - wX)
-// offset.x = -(WIDTH / 2) -((cmpos.x * ZOOM) - wX)
-
+    return sf::Vector2f(
+        (pX - center.x) / zoom,
+       -(pY - center.y) / zoom
+    );
+}
 
 template<typename T>
 std::string str_vec(T a) {
     return "(" + std::to_string(a.x) + ", " + std::to_string(a.y) + " )";
+}
+
+void draw_line(sf::Vector2f P0, sf::Vector2f P1, sf::RenderWindow&window) {
+    sf::Vertex line[] =
+    {
+        sf::Vertex(toPixels(P0.x, P0.y)),
+        sf::Vertex(toPixels(P1.x, P1.y))
+    };
+
+    window.draw(line, 2, sf::Lines);
+}
+
+void draw_coordinates(sf::RenderWindow& window) {
+    draw_line(sf::Vector2f(0, 0), sf::Vector2f(  40,   0    ), window);
+    draw_line(sf::Vector2f(0, 0), sf::Vector2f(  -40,  0    ), window);
+    draw_line(sf::Vector2f(0, 0), sf::Vector2f(   0,   40   ), window);
+    draw_line(sf::Vector2f(0, 0), sf::Vector2f(   0,  -40   ), window);
 }
 
 
@@ -131,64 +65,36 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Rotation Test!");
     sf::Event event; window.setVerticalSyncEnabled(true);
 
-
-    Line line(sf::Vector2f(0, 0), sf::Vector2f(2, 0));
-
-
-    Rect rect(0, 0, sf::Vector2f(1, 1));
-
-    float rotation = 0;
-    float velocity = 0.005f;
-    sf::Clock clock;
     while (true)
     {
         while (window.pollEvent(event)) {
             // print(event.type);
             bool isEqual = event.type == sf::Event::MouseWheelScrolled;
             if (isEqual) {
-                print("\n--------------------------");
-
-                auto mpos = sf::Mouse::getPosition();
-                auto mposf = sf::Vector2f(mpos.x, mpos.y);
-
-                auto cmpos = toCartesian( mposf  );
+                auto mpos = sf::Mouse::getPosition(window);
                 
+                auto prev_cmpos = toCartesian(mpos.x, mpos.y);
+
                 if (event.mouseWheelScroll.delta > 0) {
-                    ZOOM += 5;
+                    zoom += 0.1;
                 }
                 else {
-                    ZOOM -= 5;
-                }
+                    zoom -= 0.1;
+                }   
 
-                auto cmpos2 = toCartesian( mposf );
-
-                std::cout << "Prev: " << str_vec(cmpos) << "\t" << "New: " << str_vec(cmpos2) << "\n";
-
-                float wX = (float)mposf.x;
-                float wY = (float)mposf.y;
-
-                // offset.x = (- (( cmpos.x * ZOOM ) - wX) ) - WIDTH / 2;
-                // offset.x =  -( (cmpos.x * ZOOM) - wX )    - WIDTH / 2;
-                offset.x = -(WIDTH / 2) -((cmpos.x * ZOOM) - wX);
-                offset.y = -(-(cmpos.y * ZOOM) - wY) - HEIGHT / 2;
-
-                std::cout << "wX: " << wX << "wY: " << wY << "\n";
-
-                print((wX - (WIDTH / 2 + offset.x)) / ZOOM);
-
-                std::cout << "1 -> " << str_vec(toCartesian(mposf)) << "\n";
-                std::cout << "2 -> " << str_vec(toCartesian(sf::Vector2f(sf::Mouse::getPosition().x, sf::Mouse::getPosition().y) ) ) << "\n";
-                print("--------------------------\n");
-
+                float pX = (float)mpos.x;
+                float pY = (float)mpos.y;
+                offset.x = -((prev_cmpos.x  * zoom) - pX) - mid.x;
+                offset.y = -(-(prev_cmpos.y * zoom) - pY) - mid.y;
+                std::cout << str_vec(toCartesian(mpos.x, mpos.y)) << "\t";
+                std::cout << str_vec(prev_cmpos) << "\n";
 
             }
         };
         window.clear();
-        line.render(window);
-        rect.render(window);
+        draw_coordinates(window);
 
         window.display();
-        clock.restart();
     }
     
 

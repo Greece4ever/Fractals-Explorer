@@ -19,9 +19,10 @@ function attachListeners() {
     })
 
     res_div.addEventListener("mousemove", (e) => {
-        // console.log("Move", e.x);
-        mpos.x = e.x;
-        mpos.y = e.y;
+        let delta = e.target.getBoundingClientRect();
+        mpos.x = e.clientX - delta.x;
+        mpos.y = e.clientY - delta.y;
+
     })
 
 }
@@ -54,35 +55,27 @@ class Timer {
     }
 }
 
-let offset = {"rot" : 0.0, "x" : 0, "y" : 0, "zoom": 100.0, "velocity" : 500.0, "zoomVelocity" : 100.0, "runVelocity" : 200.0};
-// let velocity = 500.0;
 
+let offset = {
+    "rot" : 0.0, "x" : 0, "y" : 0,
+    "zoom": 100.0, "velocity" : 500.0, 
+    "zoomVelocity" : 100.0, "runVelocity" : 200.0
+};
 
-const toPixels = (x, y) => {
-    let centerX = canvas.width  / 2.0 + offset.x;
-    let centerY = canvas.height / 2.0 + offset.y;
+const toCartesian = (pX, pY) => {
+    const center = new Vector(
+        mid.x - offset.x,
+        mid.y - offset.y
+    );
 
-    return [centerX + x * offset.zoom, centerY - y * offset.zoom]
-}
-
-const toCartesian = (pixel_posX, pixel_posY, deltaX=offset.x, zoom=offset.zoom) => {
-    let centerX = canvas.width  / 2.0 + deltaX;
-    let centerY = canvas.height / 2.0 + offset.y;
-    
-    return [   
-        (pixel_posX  - centerX) / zoom,
-       -(pixel_posY - centerY) /  zoom 
-    ] 
-
-}
-
-function dict(normalised) {
-    return {"x" : normalised[0], "y": normalised[1]}
+    return new Vector(
+         (pX - center.x) / offset.zoom, 
+        -(pY - center.y) / offset.zoom 
+    );
 }
 
 
 var offsetLocation, zoomLocation, rotationLocation;
-
 let FPS_COUNTER = document.getElementById("fps_counter");
 
 
@@ -92,6 +85,8 @@ const FOR_PI = 2 * TWO_PI;
 
 function OrbitControl(timer) {
     let extraVelocity = 0.0;
+    // console.log(mpos);
+
     if (isKeyPressed("shift")) {
         extraVelocity = offset.runVelocity;
     }
@@ -116,21 +111,18 @@ function OrbitControl(timer) {
     }
 
     if (isKeyPressed("z")) {
-        let pixel_pos = {"x":mpos.x, "y" : mpos.y}
-        
-        let prev = dict(toCartesian(pixel_pos.x, pixel_pos.y));
+        let prev_cmpos = toCartesian(mpos.x, mpos.y);
         offset.zoom += zoomVelocity * timer.getElapsedTime();
+            // let zoom = offset.zoom;
+            let pX =  mpos.x;
+            let pY =  mpos.y;
 
-        
 
-        let newDeltaX = pixel_pos.x - (canvas.width / 2) - (prev.x * offset.zoom);
-        let newDeltaY = (prev.y * offset.zoom) + pixel_pos.y - (canvas.height / 2);
-        //         // let new_deltaX = mouse_pos.x - prev[0] * offset.zoom - (canvas.width / 2);
-        //         // let new_deltaY = (prev[1] * offset.zoom) + mouse_pos.y + (canvas.height / 2);
+        offset.x = -(-((prev_cmpos.x * offset.zoom) - pX) - mid.x);
+        offset.y = -(-(-( prev_cmpos.y * offset.zoom) - pY) - mid.y);
 
-        offset.x = newDeltaX;
-        offset.y = newDeltaY;
-        // offset.y = new_deltaY;
+        console.log("Prev: ",prev_cmpos, "\nNew:", toCartesian(mpos.x, mpos.y));
+
     }
 
     if (isKeyPressed("q")) {
@@ -155,7 +147,7 @@ function OrbitControl(timer) {
         }
     }
 
-    
+
     gl.uniform2f(offsetLocation,   offset.x, offset.y);
     gl.uniform1f(zoomLocation,     offset.zoom);
     gl.uniform1f(rotationLocation, offset.rot );
@@ -224,7 +216,7 @@ function init() {
 
         
         let pos = toCartesian(mpos.x, mpos.y);
-        document.getElementById("pos_counter").innerText = `(${pos[0].toFixed(2)}, ${pos[1].toFixed(2)})`;
+        document.getElementById("pos_counter").innerText = `(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})`;
         
         if (fpsTimer.getMiliseconds() >= 1000) {
             FPS_COUNTER.innerText = `FPS: ${frames}`;

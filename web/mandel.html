@@ -6,7 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism.css " rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-dark.css" rel="stylesheet">
-
+    <style>
+      hr {
+        border: 1px solid rgb(17, 6, 114) !important;
+        border-radius: 5px !important;
+      }
+    </style>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
     <title>Document</title>
@@ -26,9 +31,9 @@
   </noscript>
 
 
-    <div style="font-family: 'Courier New', Courier, monospace; font-size: 25px; position: absolute; margin-left: 10px; margin-top: 10px; color: white;" id="fps_counter">FPS: 0</div>
+    <div style="user-select: none; pointer-events: none;font-family: 'Courier New', Courier, monospace; font-size: 25px; position: absolute; margin-left: 10px; margin-top: 10px; color: white;" id="fps_counter">FPS: 0</div>
 
-    <div style="font-family: 'Courier New', Courier, monospace; font-size: 25px; position: absolute; right: 50px; margin-top: 10px; color: white;" id="pos_counter">(0, 0)</div>
+    <div style="user-select: none; pointer-events: none;font-family: 'Courier New', Courier, monospace; font-size: 25px; position: absolute; right: 50px; margin-top: 10px; color: white;" id="pos_counter">(0, 0)</div>
 
 
     <div id="res_div" style="overflow: auto; position: absolute;width: 800px; height: 600px; resize: horizontal; background-color: transparent"></div>
@@ -65,7 +70,6 @@
 </html>
 <script>
     let links = document.getElementsByClassName("nav-link");
-    console.log(links);
 
     Array.from(links).forEach(link => {
         link.addEventListener("click", () => {
