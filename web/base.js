@@ -59,11 +59,7 @@
 
 // BEGIN LOAD.JS
     const canvas = document.getElementById("canvas");
-    canvas.width = window.innerWidth;
-    // canvas.height = 600;
-    // canvas.width = 1000;
-    // canvas
-
+    canvas.width = window.innerWidth - 30;
 
     const err_div = document.getElementById("errors");
     const gl = canvas.getContext("webgl2");
@@ -185,10 +181,10 @@ a.open("GET", "/web/fragment.glsl");
 a.send();
 
 let res_div = document.getElementById("res_div");
-res_div.style.width = `${window.innerWidth}px`;
+res_div.style.width = `${window.innerWidth - 30}px`;
 let resolution_loc;
 
-let observer = new ResizeObserver(() => {
+function resizef() {
     let width  = Number( res_div.style.width.split("px", 1)[0]  );
     let height = Number( res_div.style.height.split("px", 1)[0] );
 
@@ -199,7 +195,15 @@ let observer = new ResizeObserver(() => {
         gl.uniform2f(resolution_loc, width, height);
         gl.viewport(0, 0, width, height);
     }
+}
 
+let observer = new ResizeObserver(() => {
+    resizef();
 });
 
 observer.observe(res_div)
+
+window.addEventListener("resize", () => {
+    res_div.style.width = `${window.innerWidth - 30}px`;
+    resizef();
+})

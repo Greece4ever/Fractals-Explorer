@@ -10,8 +10,8 @@ uniform float zoom;
 
 
 vec2 toCartesian(in vec2 pixel_pos) {
-    float centerX = width  - offset.x;
-    float centerY = height - offset.y;
+    float centerX = width  / 2.0  - offset.x;
+    float centerY = height / 2.0 - offset.y;
 
     return vec2(
          (pixel_pos.x  - centerX) / zoom, // (pixel_pos.x - width)  / zoom,
@@ -64,5 +64,7 @@ void main() {
     }
 
     float value = float(iter) / float(max_iter);
-    FragColor = vec4(0, value, 0, 1.0);
+    float smooth_ = float(iter) + 1.0 - log(abs(sqrt(a_2 + b_2))) / log(2.0);
+    FragColor = vec4( smooth_ * 0.05, value, smooth_ * value, 1);
 }
+
