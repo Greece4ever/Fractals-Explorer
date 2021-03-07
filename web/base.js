@@ -22,7 +22,7 @@ disableError();
     }
 
     let consoleError = (header, str_err) => {
-        err_div.innerHTML += `<pre> <b style="color: white">${header}</b><hr> <div style="color: white">${style(str_err)}</div></pre>`
+        err_div.innerHTML += `<pre> <code style="color: rgb(233, 74, 147)">${header}</b><hr> <div style="color: white">${style(str_err)}</div></pre>`
     }
 
     let console_ = (str) => {
@@ -227,6 +227,20 @@ function resizef() {
         gl.uniform2f(resolution_loc, width, height);
         gl.viewport(0, 0, width, height);
     }
+}
+
+function resizeCanvas(width, height) {
+    mid.x = width  / 2.0;
+    mid.y = height / 2.0;
+
+    canvas.width  = width;
+    canvas.height = height;
+
+    if (resolution_loc != undefined) {
+        gl.uniform2f(resolution_loc, width, height);
+        gl.viewport(0, 0, width, height);
+    }
+
 }
 
 let observer = new ResizeObserver(() => {

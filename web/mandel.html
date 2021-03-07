@@ -11,6 +11,40 @@
         border: 1px solid rgb(17, 6, 114) !important;
         border-radius: 5px !important;
       }
+
+      @keyframes colors {
+        25% { border-top-color: rgb(134, 15, 15); }
+        50% { border-right-color: rgb(134, 15, 15); }
+        75% { border-bottom-color: rgb(134, 15, 15); }
+        100% { border-left-color: rgb(134, 15, 15); }
+      }
+
+      .canvas {
+        border: 3px solid rgb(16, 16, 107);
+        border-radius: 10px;
+        margin: 10px;
+      }
+
+      .canvas:hover {
+        opacity: 0.5;
+        cursor: pointer;
+        animation: colors 2s infinite linear;
+      }
+
+      * {
+        scroll-behavior: smooth !important;
+      }
+
+      html {
+    overflow: scroll;
+    overflow-x: hidden;
+    } 
+
+      ::-webkit-scrollbar {
+    width: 0;  /* Remove scrollbar space */
+    background: transparent;  /* Optional: just make scrollbar invisible */
+}
+
     </style>
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
@@ -149,7 +183,15 @@
     <div  style="color: white !important; margin-left: 50px;" id="code"></div>
     <div  style="color: white !important; margin-left: 50px;" id="codeVertex"></div>
     
+    <code style="margin-left: 20px; font-weight: 500;">Coloring Algorithms</code>
+    <hr>
+    <div style="margin-top: 50px;" class="row" id="preview">
 
+    </div>
+
+    <!-- <canvas width="200px" height="128px" id="sets">
+
+    </canvas> -->
     
 </body>
 </html>
@@ -163,13 +205,16 @@
                 i.className = "nav-link";
 
                 let item = document.getElementById(i.getAttribute("for"));
-
+                // item.setAttribute("hidden", true);
+                item.hidden = true;
                 item.style.visibility = "hidden";
                 item.style.position = "absolute";
             });
             let item = document.getElementById(link.getAttribute("for"));
+            // item.setAttribute("hidden", true);
 
             link.className = "nav-link active";
+            item.hidden = false;
             item.style.visibility = "visible";
             item.style.position = "relative";
         })

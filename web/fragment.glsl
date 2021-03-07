@@ -73,45 +73,53 @@ void main() {
         _z.real = z.real;
         _z.imag = z.imag;
 
-
         if ( (a_2 + b_2) > 4.0) {
             iter = i;
             break;
         }
+
+
     }
 
     float value = float(iter) / float(max_iter);
 
     switch (C_ALOGRITHM) {
-        case 1:
+        case 0:
         {
             float smooth_ = float(iter) + 1.0 - log(abs(sqrt(a_2 + b_2))) / log(2.0);
             FragColor = vec4( smooth_ * 0.05, value, smooth_ * value, 1);
             break;
         }
-        case 3:
+        case 1:
         {
             float smooth_ = float(iter) + 1.0 - log(abs(sqrt(a_2 + b_2))) / log(2.0);
             FragColor = vec4(value / smooth_, 0.0, value, 1);
             break;
         }
-        case 5:
+        case 2:
         {
             float delta = log2(z.real) * value * exp(b_2 / a_2);
             FragColor = vec4(delta, value, log(delta / (1.0 - delta * value)), 1.0);
             break;
 
         }
-        case 0:
+        case 3:
         {
             float sm = pow(log(value * MATH_PI), log2(MATH_PI));
             FragColor = vec4(value *  log2(2.718 * sm),  1.0/sm, value, 1);
             break;
         }
-
+        case 4: {
+            FragColor = vec4(0.0, value, 0.0, 1.0);
+            break;
+        }
+        case 5: {
+            float smooth_ = float(iter) + 1.0 - log(abs(sqrt(a_2 + b_2))) / log(2.0);
+            float smooth_2 = smooth_ + 1.0 - log(smooth_ * abs(sqrt(a_2 + b_2))) / log(2.0);
+            float smooth_3 = sin(z.real *  MATH_PI) * log(smooth_ / smooth_2);
+            FragColor = vec4(sin(smooth_3), sin(smooth_), cos(smooth_2), 1.0);
+            break;
+        }
     }
-
-    // float smooth_ = float(iter) + 1.0 - log(abs(sqrt(a_2 + b_2))) / log(2.0);
-    // FragColor = vec4( smooth_ * 0.05, value, smooth_ * value, 1);
 }
 
