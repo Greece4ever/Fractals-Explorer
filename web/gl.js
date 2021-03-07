@@ -76,6 +76,7 @@ const toCartesian = (pX, pY) => {
 
 
 var offsetLocation, zoomLocation, rotationLocation;
+var C_ALOGRITHM;
 let FPS_COUNTER = document.getElementById("fps_counter");
 
 
@@ -85,7 +86,6 @@ const FOR_PI = 2 * TWO_PI;
 
 function OrbitControl(timer) {
     let extraVelocity = 0.0;
-    // console.log(mpos);
 
     if (isKeyPressed("shift")) {
         extraVelocity = offset.runVelocity;
@@ -103,35 +103,51 @@ function OrbitControl(timer) {
     }
 
     if (isKeyPressed("w")) {
-        offset.y += velocity * timer.getElapsedTime();
-    }
-
-    if (isKeyPressed("s")) {
         offset.y -= velocity * timer.getElapsedTime();
     }
 
-    if (isKeyPressed("z")) {
+    if (isKeyPressed("s")) {
+        offset.y += velocity * timer.getElapsedTime();
+    }
+
+    let z_pressed = isKeyPressed("z");
+    let x_pressed = isKeyPressed("x");
+
+    if (z_pressed || x_pressed) {
         let prev_cmpos = toCartesian(mpos.x, mpos.y);
-        offset.zoom += zoomVelocity * timer.getElapsedTime();
-            // let zoom = offset.zoom;
+
+        if(z_pressed) 
+            offset.zoom += zoomVelocity * timer.getElapsedTime();
+        if (x_pressed)
+            offset.zoom -= zoomVelocity * timer.getElapsedTime();
+
             let pX =  mpos.x;
             let pY =  mpos.y;
 
 
         offset.x = -(-((prev_cmpos.x * offset.zoom) - pX) - mid.x);
         offset.y = -(-(-( prev_cmpos.y * offset.zoom) - pY) - mid.y);
-
-        console.log("Prev: ",prev_cmpos, "\nNew:", toCartesian(mpos.x, mpos.y));
-
+        document.getElementById("zoom").innerText = `${offset.zoom.toExponential(2)}`
     }
+
 
     if (isKeyPressed("q")) {
         offset.zoomVelocity += 500.0;
     }
 
-    if (isKeyPressed("x")) {
-        offset.zoom -= zoomVelocity * timer.getElapsedTime();
+    if (isKeyPressed("k")) {
+        offset.zoomVelocity *= 2;
     }
+
+
+    if (isKeyPressed("e")) {
+        offset.zoomVelocity -= 500.0;
+    }
+    if (isKeyPressed("l")) {
+        offset.zoomVelocity /= 2;
+    }
+
+
 
     if (isKeyPressed("arrowright")) {
         offset.rot += 2 * timer.getElapsedTime();
@@ -171,8 +187,8 @@ function init() {
     const html = Prism.highlight(fShader, Prism.languages.glsl, 'glsl');
     const html2 = Prism.highlight(vShader, Prism.languages.glsl, 'glsl');
 
-    document.getElementById("code").innerHTML       = "<pre>" + html + "</pre>";
-    document.getElementById("codeVertex").innerHTML = "<pre>" + html2 + "</pre>";
+    document.getElementById("code").innerHTML       = `<pre style="color:white !important">` + html + "</pre>";
+    document.getElementById("codeVertex").innerHTML = `<pre style="color:white !important">` + html2 + "</pre>";
 
     program = createProgram(vShader, fShader);
     gl.useProgram(program);
@@ -199,13 +215,14 @@ function init() {
     offsetLocation = gl.getUniformLocation(program, "offset");
     zoomLocation   = gl.getUniformLocation(program, "zoom");
     rotationLocation = gl.getUniformLocation(program, "ROTATION");
-
+    C_ALOGRITHM = gl.getUniformLocation(program, "C_ALOGRITHM");
     
 
     gl.uniform2f(resolution_loc, canvas.width, canvas.height);
     gl.uniform2f(offsetLocation, 0, 0);
     gl.uniform1f(zoomLocation, 100.0);
     gl.uniform1f(rotationLocation, 0.0);
+    gl.uniform1i(C_ALOGRITHM, 0);
 
     timer = new Timer();    
 
@@ -228,7 +245,7 @@ function init() {
         window.requestAnimationFrame(loop);
     }
 
-    
+    canvas.focus();
     attachListeners();
     timer.restart();    
     fpsTimer.restart();

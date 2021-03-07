@@ -6,13 +6,15 @@ uniform vec2 offset;
 uniform float zoom;
 uniform float ROTATION;
 
+uniform int C_ALOGRITHM;
+
 #define width  u_resolution.x
 #define height u_resolution.y
-
+#define MATH_PI 3.1415926538
 
 vec2 toCartesian(in vec2 pixel_pos) {
     float centerX = (width  / 2.0)  - offset.x;
-    float centerY = (height / 2.0)  - offset.y;
+    float centerY = (height / 2.0)  + offset.y;
 
     return vec2(
          (pixel_pos.x - centerX) / zoom, 
@@ -79,7 +81,37 @@ void main() {
     }
 
     float value = float(iter) / float(max_iter);
-    float smooth_ = float(iter) + 1.0 - log(abs(sqrt(a_2 + b_2))) / log(2.0);
-    FragColor = vec4( smooth_ * 0.05, value, smooth_ * value, 1);
+
+    switch (C_ALOGRITHM) {
+        case 1:
+        {
+            float smooth_ = float(iter) + 1.0 - log(abs(sqrt(a_2 + b_2))) / log(2.0);
+            FragColor = vec4( smooth_ * 0.05, value, smooth_ * value, 1);
+            break;
+        }
+        case 3:
+        {
+            float smooth_ = float(iter) + 1.0 - log(abs(sqrt(a_2 + b_2))) / log(2.0);
+            FragColor = vec4(value / smooth_, 0.0, value, 1);
+            break;
+        }
+        case 5:
+        {
+            float delta = log2(z.real) * value * exp(b_2 / a_2);
+            FragColor = vec4(delta, value, log(delta / (1.0 - delta * value)), 1.0);
+            break;
+
+        }
+        case 0:
+        {
+            float sm = pow(log(value * MATH_PI), log2(MATH_PI));
+            FragColor = vec4(value *  log2(2.718 * sm),  1.0/sm, value, 1);
+            break;
+        }
+
+    }
+
+    // float smooth_ = float(iter) + 1.0 - log(abs(sqrt(a_2 + b_2))) / log(2.0);
+    // FragColor = vec4( smooth_ * 0.05, value, smooth_ * value, 1);
 }
 
