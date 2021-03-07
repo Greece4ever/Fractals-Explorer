@@ -4,6 +4,7 @@ precision highp float;
 uniform vec2 u_resolution;
 uniform vec2 offset; 
 uniform float zoom;
+uniform float ROTATION;
 
 #define width  u_resolution.x
 #define height u_resolution.y
@@ -19,6 +20,20 @@ vec2 toCartesian(in vec2 pixel_pos) {
     );
 }
 
+// sin(-x) = -sin(x), where x > 0
+// cos(-x) = cos(x),  where x > 0
+
+vec2 setRotation(vec2 pos) {
+    float SIN_ = sin(ROTATION);
+    float COS_ = cos(ROTATION);
+
+    float x = pos.x * COS_ - pos.y * SIN_;
+    float y = pos.x * SIN_ + pos.y * COS_;
+    return vec2(x, y);
+
+    // float len = sqrt( (pos.x * pos.x) + (pos.y * pos.y) ); // sqrt(x^2 + y^2)
+    // return vec2(sin(angle) * leng)
+}
 
 struct Complex {
     float real;
@@ -28,7 +43,7 @@ struct Complex {
 out vec4 FragColor;
 
 void main() {
-    vec2 pos = toCartesian(gl_FragCoord.xy);
+    vec2 pos = setRotation( toCartesian(gl_FragCoord.xy) );
     float x = pos.x, y = pos.y;
 
     Complex z;

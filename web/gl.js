@@ -54,7 +54,7 @@ class Timer {
     }
 }
 
-let offset = {"x" : 0, "y" : 0, "zoom": 100.0, "velocity" : 500.0, "zoomVelocity" : 100.0, "runVelocity" : 200.0};
+let offset = {"rot" : 0.0, "x" : 0, "y" : 0, "zoom": 100.0, "velocity" : 500.0, "zoomVelocity" : 100.0, "runVelocity" : 200.0};
 // let velocity = 500.0;
 
 
@@ -81,9 +81,14 @@ function dict(normalised) {
 }
 
 
-var offsetLocation, zoomLocation;
+var offsetLocation, zoomLocation, rotationLocation;
 
 let FPS_COUNTER = document.getElementById("fps_counter");
+
+
+const TWO_PI = Math.PI;
+const FOR_PI = 2 * TWO_PI; 
+
 
 function OrbitControl(timer) {
     let extraVelocity = 0.0;
@@ -120,8 +125,8 @@ function OrbitControl(timer) {
 
         let newDeltaX = pixel_pos.x - (canvas.width / 2) - (prev.x * offset.zoom);
         let newDeltaY = (prev.y * offset.zoom) + pixel_pos.y - (canvas.height / 2);
-                // let new_deltaX = mouse_pos.x - prev[0] * offset.zoom - (canvas.width / 2);
-                // let new_deltaY = (prev[1] * offset.zoom) + mouse_pos.y + (canvas.height / 2);
+        //         // let new_deltaX = mouse_pos.x - prev[0] * offset.zoom - (canvas.width / 2);
+        //         // let new_deltaY = (prev[1] * offset.zoom) + mouse_pos.y + (canvas.height / 2);
 
         offset.x = newDeltaX;
         offset.y = newDeltaY;
@@ -136,8 +141,24 @@ function OrbitControl(timer) {
         offset.zoom -= zoomVelocity * timer.getElapsedTime();
     }
 
-    gl.uniform2f(offsetLocation, offset.x, offset.y);
-    gl.uniform1f(zoomLocation, offset.zoom);
+    if (isKeyPressed("arrowright")) {
+        offset.rot += 2 * timer.getElapsedTime();
+        if (offset.rot > FOR_PI) {
+            offset.rot = 0;
+        }
+    }
+
+    if (isKeyPressed("arrowleft")) {
+        offset.rot -= 2 * timer.getElapsedTime();
+        if (offset.rot < -FOR_PI) {
+            offset.rot = 0;
+        }
+    }
+
+    
+    gl.uniform2f(offsetLocation,   offset.x, offset.y);
+    gl.uniform1f(zoomLocation,     offset.zoom);
+    gl.uniform1f(rotationLocation, offset.rot );
 }
 
 
@@ -185,12 +206,14 @@ function init() {
     resolution_loc   = gl.getUniformLocation(program, "u_resolution");
     offsetLocation = gl.getUniformLocation(program, "offset");
     zoomLocation   = gl.getUniformLocation(program, "zoom");
+    rotationLocation = gl.getUniformLocation(program, "ROTATION");
 
     
 
     gl.uniform2f(resolution_loc, canvas.width, canvas.height);
     gl.uniform2f(offsetLocation, 0, 0);
     gl.uniform1f(zoomLocation, 100.0);
+    gl.uniform1f(rotationLocation, 0.0);
 
     timer = new Timer();    
 
@@ -219,4 +242,15 @@ function init() {
     fpsTimer.restart();
 
     loop();
+}
+
+
+function generateTable() {
+	let table = {"sin" : [], "cos" : []};
+
+	for (let i=0; i <= 360; i++) {
+        table.sin.push(Math.sin(i));
+        table.cos.push(Math.cos(i));
+    }
+    return table;
 }

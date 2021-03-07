@@ -1,4 +1,17 @@
+let err_div_log = document.getElementById("ERROR_COMPILATION");
 
+function disableError() {
+    err_div_log.style.visibility = "hidden";
+    err_div_log.style.position = "absolute";
+}
+
+function setError(str) {
+    err_div_log.style.visibility = "visible";
+    err_div_log.style.position = "relative";
+    err_div_log.children[0].innerHTML = str;
+}
+
+disableError();
 
 // BEGIN DEBUG.JS
     const style = (str) => {
@@ -65,8 +78,10 @@
     const gl = canvas.getContext("webgl2");
     var webgl_console;
 
-    if (!gl) 
-        consoleError("Initialising Context...", `ERROR: Webgl2 Not supported by Browser`)
+    if (!gl) {
+        consoleError("Initialising Context...", `ERROR: Webgl2 Not supported by Browser`);
+        setError("WebGL2 not supported by browser, cannot continue.");
+    }
     else 
         consoleError("Initialising Context...", `SUCCESS: Initialised Webgl2 Context`)
 
@@ -118,7 +133,10 @@
         let compiled = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
         if (!compiled) {
             compilationLog = gl.getShaderInfoLog(shader);
-            consoleError(`Compilation of shader <b style='color: green'>${types[type]}</b> failed`, compilationLog);
+            let str1 = `Compilation of shader <b style='color: green'>${types[type]}</b> failed`;
+            let str2 =  compilationLog;
+            consoleError(str1, str2);
+            setError(`Failed to compile shader <b style="color : #fff">${types[type]}</b>. Additional information can be found in the console output below.`);
             return false;
         }
         return shader;
@@ -142,6 +160,7 @@
         if ( !gl.getProgramParameter( program, gl.LINK_STATUS) ) {
             var info = gl.getProgramInfoLog(program);
             consoleError('Could not compile WebGL program. ', info);
+            setError("Failed to link/compile WebGL shader program, check the logs below.");
         }
         return program;
     }

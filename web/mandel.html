@@ -12,6 +12,20 @@
     <title>Document</title>
 </head>
 <body style="background-color: black;">
+
+  <div style="visibility: hidden;" id="ERROR_COMPILATION">
+    <div style="margin: 10px; background-color: rgb(67, 12, 17); border-color: rgb(106, 17, 26); color: rgb(223, 122, 131);" class="alert alert-danger" role="alert">
+    </div>  
+  </div>
+  <noscript>
+    <div style="margin: 10px; background-color: rgb(67, 12, 17); border-color: rgb(106, 17, 26); color: rgb(223, 122, 131);" class="alert alert-danger" role="alert">
+      It seems like your browser does cannot execute JavaScript or it's been disabled.
+      This page cannot function without JavaScript, you'll have to enable it.
+    </div>  
+  
+  </noscript>
+
+
     <div style="font-family: 'Courier New', Courier, monospace; font-size: 25px; position: absolute; margin-left: 10px; margin-top: 10px; color: white;" id="fps_counter">FPS: 0</div>
 
     <div style="font-family: 'Courier New', Courier, monospace; font-size: 25px; position: absolute; right: 50px; margin-top: 10px; color: white;" id="pos_counter">(0, 0)</div>
@@ -21,7 +35,10 @@
 
     
     <canvas width="800" height="600" id="canvas">
-
+      <div style="margin: 10px; background-color: rgb(67, 12, 17); border-color: rgb(106, 17, 26); color: rgb(223, 122, 131);" class="alert alert-danger" role="alert">
+        It seems like your browser does not support the HTML canvas element.
+        You can find the list of supported browsers <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#browser_compatibility">here</a>.
+      </div>  
     </canvas>
 
     <ul style="margin-top: 50px; margin-left: 20px;" class="nav nav-pills nav-fill">
