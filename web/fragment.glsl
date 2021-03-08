@@ -1,12 +1,11 @@
 #version 300 es
 precision highp float;
 
-uniform vec2 u_resolution;
-uniform vec2 offset; 
+uniform vec2  u_resolution;
+uniform vec2  offset; 
 uniform float zoom;
 uniform float ROTATION;
-
-uniform int C_ALOGRITHM;
+uniform int   C_ALOGRITHM;
 
 #define width  u_resolution.x
 #define height u_resolution.y
