@@ -118,9 +118,6 @@ int main(int argc, char* argv[]) {
 
     uint frames = 0;
 
-    sf::Font font;
-    font.loadFromFile("../font.ttf");
-
     gltInit();
         GLTtext *FPS_TEXT = gltCreateText();
         gltSetText(FPS_TEXT, "FPS: 0");

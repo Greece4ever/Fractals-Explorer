@@ -3,8 +3,6 @@
 #include "compile_sources.hpp"
 #include <cmath>
 
-#include <sys/resource.h>
-
 int main() {
     // int width = 800, height = 600;
     dim::width  = 800;
@@ -34,18 +32,13 @@ int main() {
     DTYPE      SMOOTH[SIZE];
     DTYPE      SMOOTH_COPY[SIZE];
 
-    printf("hey\n");
 
     cl::Buffer GPU_PIXELS(context, CL_MEM_READ_WRITE, BUFFER_SIZE);
     cl::Buffer GPU_SMOOTH(context, CL_MEM_READ_WRITE, BUFFER_SIZE);
-    printf("hey\n");
 
 
     queue.enqueueWriteBuffer(GPU_PIXELS, CL_TRUE, 0, BUFFER_SIZE, CPU_PIXELS);
     queue.enqueueWriteBuffer(GPU_SMOOTH, CL_TRUE, 0, BUFFER_SIZE, SMOOTH);
-
-
-
 
     pos position;
         position.offsetX = 0;
@@ -95,18 +88,6 @@ int main() {
             sf::Vector2f cmpos =  toCartesian(position, mpos);
 
             position.zoom += velocity;
-
-            sf::Vector2f cmpos_2 =  toCartesian(position, mpos);
-            
-            // position.offsetX += dist2d(cmpos.x, cmpos_2.x) * position.zoom;
-            // position.offsetY += dist(cmpos.y, cmpos_2.y) * position.zoom;
-            // position.offsetX += -dist(cmpos.x, cmpos_2.x) * position.zoom; 
-
-
-            // sf::Vector2f cmpos_3 = toCartesian(position, mpos);
-
-            // printf("Old: %.3f New: %.3f Expected: %.3f Actual: %.3f\n", cmpos.y, cmpos_2.y, cmpos_2.y + dist(cmpos.y, cmpos_2.y), toCartesian(position, mpos).y);
-
 
         } 
         sf::Vector2i mpos =  sf::Mouse::getPosition();

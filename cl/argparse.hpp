@@ -40,6 +40,7 @@ std::string loadKernelSource(std::string path, std::string width, std::string he
 
 	cord_array[0] = __width;
 	cord_array[1] = __height;
+	delete[] cord_array; // Wtf what I thinking
 
 	return source_code;
 }
