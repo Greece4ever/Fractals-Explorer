@@ -32,9 +32,6 @@ function attachListeners() {
             case "5":
                 gl.uniform1i(C_ALOGRITHM, 4);
                 break;    
-            case "6":
-                gl.uniform1i(C_ALOGRITHM, 5);
-                break;        
         }
     })
 
