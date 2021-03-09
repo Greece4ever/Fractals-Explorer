@@ -1,6 +1,6 @@
 ## Mandelbrot
 
-![GIF Demo](https://i.imgur.com/KLjyGRk.gif)
+![Image Demo of Mandelbrot](https://i.imgur.com/wVsxQsm.png)
 
 GPU accelerated rendering of the [Mandelbrot](https://en.wikipedia.org/wiki/Mandelbrot_set) set in 3 different ways (2 really)
 
