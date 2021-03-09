@@ -60,12 +60,6 @@ int main() {
     float last_time = 0;
     sf::Clock timer;
 
-    sf::Font font;
-    font.loadFromFile("./font.ttf");
-    sf::Text text("d", font);
-        text.setPosition(10, 10);
-
-
     while (running)
     {
         while (window.pollEvent(event)) { if (event.type == sf::Event::Closed) { running = false; } }
@@ -133,10 +127,6 @@ int main() {
             }
 
         glEnd();
-        float currentTime = timer.getElapsedTime().asSeconds();
-        float fps = 1.0f / (currentTime);
-        text.setString(std::to_string(fps));
-        // window.draw(text);
 
         window.display();
         timer.restart();
@@ -149,6 +139,13 @@ function run ()
 { 
     g++ $1 -o a.out -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network -lOpenCL -lGL && ./a.out
 }
+
+
+function run () 
+{ 
+    g++ cl_mandel.cpp -o a.out -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network -lOpenCL -lGL && ./a.out
+}
+
 
 */
 

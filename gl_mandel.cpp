@@ -1,6 +1,6 @@
 /* The shader OpenGL way of doing things, in just one file
    To Build:
-        g++ -std=c++17 -c gl_mandel.cpp && g++ $gl_mandel.o -o a.out -lsfml-graphics -lsfml-window -lsfml-system -lGL -lGLEW && rm $file.o 
+        g++ -std=c++17 -c gl_mandel.cpp && g++ gl_mandel.o -o gl_mandel.out -lsfml-graphics -lsfml-window -lsfml-system -lGL -lGLEW && rm gl_mandel.o 
    To Run:
         ./a.out
  */
