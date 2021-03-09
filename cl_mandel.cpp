@@ -255,12 +255,10 @@ int main() {
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
             velocity += 1.0f;
-            printf("%.2f\n", velocity);
         }    
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
             velocity += 100.0f;
-            printf("%.2f\n", velocity);
         }
 
 

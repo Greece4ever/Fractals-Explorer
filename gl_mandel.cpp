@@ -536,6 +536,8 @@ int main(int argc, char* argv[]) {
                         break;
                     case sf::Keyboard::Enter: {
                         world.init(world.res.x, world.res.y);
+                        world.rotation = 0;
+                        break;
                     }
                     case sf::Keyboard::F11: {
                         float NEW_WIDTH, NEW_HEIGHT;
@@ -562,6 +564,7 @@ int main(int argc, char* argv[]) {
                         window.setSize(sf::Vector2u(NEW_WIDTH, NEW_HEIGHT));
                         glViewport(0, 0, NEW_WIDTH, NEW_HEIGHT);
                         world.resize(NEW_WIDTH, NEW_HEIGHT);
+                        break;
                     }
                     }
                     break;
