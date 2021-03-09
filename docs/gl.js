@@ -13,7 +13,7 @@ function attachListeners() {
     })
 
     window.addEventListener("keypress", (e) => {
-        switch (e.key) {
+        switch (e.key.toLowerCase()) {
             case "1":
                 gl.uniform1i(C_ALOGRITHM, 0);
                 break;
@@ -35,6 +35,14 @@ function attachListeners() {
             case "6":
                 gl.uniform1i(C_ALOGRITHM, 5);
                 break;        
+            case "enter":
+                offset.zoom = 100.0;
+                offset.zoomVelocity = 100.0;
+                offset.velocity = 500.0;
+                offset.x = 0.0;
+                offset.y = 0.0;
+                offset.rot = 0.0;
+                break;
         }
     })
 
@@ -171,6 +179,11 @@ function OrbitControl(timer) {
             offset.zoom += zoomVelocity * timer.getElapsedTime();
         if (x_pressed)
             offset.zoom -= zoomVelocity * timer.getElapsedTime();
+
+        if (offset.zoom < 1) {
+            offset.zoom = 2;
+            offset.zoomVelocity = 100.0;
+        }
 
             let pX =  mpos.x;
             let pY =  mpos.y;
