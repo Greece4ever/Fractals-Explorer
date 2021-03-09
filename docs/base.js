@@ -196,7 +196,7 @@ a.addEventListener("load", (e) => {
     // console.log(a.response);
 })
 
-a.open("GET", "/web/fragment.glsl");
+a.open("GET", "/docs/fragment.glsl");
 a.send();
 
 let res_div = document.getElementById("res_div");
