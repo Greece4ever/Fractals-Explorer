@@ -241,6 +241,48 @@ var mpos = {"x" : 0, "y" : 0};
 var frames = 0;
 let fpsTimer = new Timer();
 
+var selected;
+
+function initSyntax() {
+    let CODE_ORG = document.getElementById("code");
+    for (let i=0; i < shaders.length; i++) {
+        let HTML = Prism.highlight(shaders[i], Prism.languages.glsl, 'glsl');
+        let ID = Math.random();
+        CODE_ORG.innerHTML += `<pre id="${ID}" style="color:white !important">${HTML}</pre>`;
+            let code = document.getElementById(ID.toString());
+
+        let element = document.createElement("option");
+            element.innerText = shader_paths[i];
+        
+        element.addEventListener("click", () => {
+            let sel_elm = document.getElementById(selected);
+            
+            sel_elm.style.visibility = "hidden";
+            sel_elm.style.position = "absolute";
+            sel_elm.style.display = "none";
+
+            let this_code = document.getElementById(ID);
+
+            this_code.style.visibility = "visible";
+            this_code.style.position = "relative";
+            this_code.style.removeProperty("display");
+            // this_code.style.display = "box";
+
+            selected = ID;
+        })
+
+        SELECT_DIV.appendChild(element);
+
+        if (i !== 0) {
+            code.style.visibility = "hidden";
+            code.style.position = "absolute";
+            code.style.display = "none";
+        } else {
+            selected = ID;
+        }
+    }
+}
+
 
 function init() {
     printInfo();
@@ -248,13 +290,15 @@ function init() {
         err_div.innerHTML += "<pre id=\"console\"></pre>"
         webgl_console = document.getElementById("console");
     
-    const html = Prism.highlight(fShader, Prism.languages.glsl, 'glsl');
-    const html2 = Prism.highlight(vShader, Prism.languages.glsl, 'glsl');
 
-    document.getElementById("code").innerHTML       = `<pre style="color:white !important">` + html + "</pre>";
+    // const html = Prism.highlight(shaders[0], Prism.languages.glsl, 'glsl');
+    const html2 = Prism.highlight(vShader, Prism.languages.glsl, 'glsl');
+    initSyntax();
+    // document.getElementById("code").innerHTML       = `<pre style="color:white !important">` + html + "</pre>";
     document.getElementById("codeVertex").innerHTML = `<pre style="color:white !important">` + html2 + "</pre>";
 
-    program = createProgram(vShader, fShader);
+
+    program = createProgram(vShader, shaders[0]);
     gl.useProgram(program);
 
     VAO = gl.createVertexArray();

@@ -1,3 +1,14 @@
+const vShader = ` 
+#version 300 es
+
+in vec2 pos;
+
+void main() {
+    gl_Position = vec4(pos, 0.0, 1.0);
+}
+`.trim();
+
+
 let err_div_log = document.getElementById("ERROR_COMPILATION");
 
 function disableError() {
@@ -22,11 +33,18 @@ disableError();
     }
 
     let consoleError = (header, str_err) => {
-        err_div.innerHTML += `<pre> <code style="color: rgb(233, 74, 147)">${header}</b><hr> <div style="color: white">${style(str_err)}</div></pre>`
+        let id = Math.random() * Math.random();
+        err_div.innerHTML += `<pre> <code style="color: rgb(233, 74, 147)">${header}</b><hr> <div style="color: white">${style(str_err)}</div></pre>`;
     }
 
-    let console_ = (str) => {
-        webgl_console.innerHTML += `<span style="color: white">${style(str)}</span>\n`
+    let console_ = (str, elm=null) => {
+        if (elm === null) {
+            webgl_console.innerHTML += `<span style="color: white">${style(str)}</span>\n`;
+        } else {
+            elm.innerHTML += `<span style="color: white">${style(str)}</span>\n`;
+            console.log("Elm is", elm, elm.innerHTML);
+            console.log(elm.children[0])
+        }
     }
 
     const getHardWareInfo = () => {
@@ -70,6 +88,8 @@ disableError();
     }
 // END DEBUG.JS
 
+var shaderDIV;
+
 // BEGIN LOAD.JS
     const canvas = document.getElementById("canvas");
     canvas.width = window.innerWidth - 30;
@@ -85,7 +105,7 @@ disableError();
     else 
         consoleError("Initialising Context...", `SUCCESS: Initialised Webgl2 Context`)
 
-    consoleError("Loading Shaders...", "");
+    shaderDIV =consoleError("Loading Shaders...", "");
     err_div.innerHTML += "<pre id=\"console0\"></pre>";
     webgl_console = document.getElementById("console0");
 // END LOAD.JS
@@ -166,38 +186,33 @@ disableError();
     }
 // END GL_WRAPPER.JS
 
-const vShader = `
-#version 300 es
+function loadShader(URL, callback) {
+    let a = new XMLHttpRequest();
+    let ID = Math.random();
+    let ELM = `[INFO] Loading Shader from <b style="color: green">"${URL}"</b> <b id="${ID}">0%</b>`
+    console_(ELM);
+    let ELEMENT = document.getElementById(ID.toString());
 
-in vec2 pos;
+    a.addEventListener("progress", (e) => {
+        let percentage = "?";
+        if (e.lengthComputable) {
+            percentage = e.loaded / e.total * 100;
+        }
+        ELEMENT.innerText = `${percentage}%`;
+    })
 
-void main() {
-    gl_Position = vec4(pos, 0.0, 1.0);
+    a.addEventListener("load", (e) => {
+        let shader_response = a.response;
+        return callback(shader_response);
+    })
+    
+    a.addEventListener("error", (e) => {
+        setError(`Failed to fetch shader at "${URL}".`);
+    })
+
+    a.open("GET", URL);
+    a.send();
 }
-`.trim();
-
-var fShader;
-
-console_("[INFO] Loading Fragment Shader <b id=\"per0\">0%</b>");
-
-
-let a = new XMLHttpRequest();
-a.addEventListener("progress", (e) => {
-    let percentage = "?";
-    if (e.lengthComputable) {
-        percentage = e.loaded / e.total * 100;
-    }
-    document.getElementById("per0").innerText = `${percentage}%`;
-})
-
-a.addEventListener("load", (e) => {
-    fShader = a.response;
-    init();
-    // console.log(a.response);
-})
-
-a.open("GET", "/web/fragment.glsl");
-a.send();
 
 let res_div = document.getElementById("res_div");
 res_div.style.width = `${window.innerWidth - 30}px`;
@@ -253,3 +268,27 @@ window.addEventListener("resize", () => {
     res_div.style.width = `${window.innerWidth - 30}px`;
     resizef();
 })
+
+var fShader;
+
+let shader_paths = [
+    './fragment.glsl',
+    './julia.glsl',
+]
+
+let shaders = [];
+
+let SID = 0;
+function load_shaders() {
+    loadShader(shader_paths[SID], (shader_resp) => {
+        shaders.push(shader_resp);
+        if (SID !== shader_paths.length - 1) {
+            SID++;
+            return load_shaders();
+        } else {
+            init();
+        }
+    })
+}
+
+load_shaders();
