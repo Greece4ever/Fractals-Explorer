@@ -1,3 +1,41 @@
+hr {
+  border: 1px solid rgb(17, 6, 114) !important;
+  border-radius: 5px !important;
+}
+
+@keyframes colors {
+  25% { border-top-color: rgb(134, 15, 15); }
+  50% { border-right-color: rgb(134, 15, 15); }
+  75% { border-bottom-color: rgb(134, 15, 15); }
+  100% { border-left-color: rgb(134, 15, 15); }
+}
+
+.canvas {
+  border: 3px solid rgb(16, 16, 107);
+  border-radius: 10px;
+  margin: 10px;
+}
+
+.canvas:hover {
+  opacity: 0.5;
+  cursor: pointer;
+  animation: colors 2s infinite linear;
+}
+
+* {
+  scroll-behavior: smooth !important;
+}
+
+html {
+overflow: scroll;
+overflow-x: hidden;
+} 
+
+::-webkit-scrollbar {
+width: 0;  /* Remove scrollbar space */
+background: transparent;  /* Optional: just make scrollbar invisible */
+}
+
 /* The container must be positioned relative: */
  .custom-select {
     position: relative;

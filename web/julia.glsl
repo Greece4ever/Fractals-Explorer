@@ -1,19 +1,21 @@
+#version 300 es
 precision mediump float;
 
-uniform vec2 u_resolution;
-uniform vec2 u_mouse;
-uniform float u_time;
-
-#define mid vec2(u_resolution.x / 2.0, u_resolution.y / 2.0)
-
-#define WIDHT u_resolution.x
-#define HEIGHT u_resolution.x
-
-vec2 offset = vec2(0, 0);
-float zoom = 200.0;
 
 #define product(a, b) vec2(a.x*b.x-a.y*b.y, a.x*b.y+a.y*b.x)
 #define add(a, b) vec2(a.x + b.x, a.y + b.y)
+
+uniform vec2 u_resolution;
+uniform vec2 offset;
+
+uniform float zoom;
+uniform float ROTATION;
+
+#define WIDHT u_resolution.x
+#define HEIGHT u_resolution.y
+
+// float zoom = 200.0;
+
 
 float toRad(float deg) {
     return deg * 0.0174532925;
@@ -52,6 +54,7 @@ vec2 comp_powf(vec2 comp, int n) {
     return a;
 }
 
+out vec4 color;
 
 void main() {
     vec4 pixel = gl_FragCoord;
@@ -60,13 +63,16 @@ void main() {
     vec2 c0 = pos;//vec2(0.1, 1);
     // vec2 C = vec2(0.0, 0.8);
     vec2 C = vec2(-0.78, 0.13);
+
+    // vec2 C = pos;
+
     int iter = 0;
 
     const int MAX_ITER = 500;
 
     for (int i=0; i < MAX_ITER; i++) {
         c0 = add(comp_powf(c0, 2), C);
-        if ( (c0.x * c0.x + c0.y * c0.y) > 10.0 ) {
+        if ( (c0.x * c0.x + c0.y * c0.y) > 20.0 ) {
             iter = i;
             break;
         }
@@ -76,6 +82,8 @@ void main() {
     float value = float(iter) / float(MAX_ITER);
     float smooth_ = float(iter) + 1.0 - log(abs(sqrt(c0.x * c0.x + c0.y * c0.y))) / log(2.0);
 
-    gl_FragColor = vec4(value * atan(smooth_), value, atan(1.0/smooth_), 1.0);
+    color = vec4(value * atan(smooth_), value, atan(1.0/smooth_), smooth_);
+
+    // gl_FragColor = vec4(value * atan(smooth_), value, atan(1.0/smooth_), smooth_);
 }
 

@@ -71,11 +71,9 @@ function attachListeners() {
     })
 
     res_div.addEventListener("click", () => {
-        console.log("click");
         res_div.style.resize = "none";
         resizeCanvas(screen.width, screen.height);
         document.body.requestFullscreen();
-        console.log("hello world");
         setTimeout(() => {
             resizeCanvas(screen.width, screen.height);
         }, 100)
@@ -227,10 +225,10 @@ function OrbitControl(timer) {
         }
     }
 
-
-    gl.uniform2f(offsetLocation,   offset.x, offset.y);
-    gl.uniform1f(zoomLocation,     offset.zoom);
-    gl.uniform1f(rotationLocation, offset.rot );
+    selectedProgram.updateCommonUniforms();
+    // gl.uniform2f(offsetLocation,   offset.x, offset.y);
+    // gl.uniform1f(zoomLocation,     offset.zoom);
+    // gl.uniform1f(rotationLocation, offset.rot );
 }
 
 
@@ -266,7 +264,6 @@ function initSyntax() {
             this_code.style.visibility = "visible";
             this_code.style.position = "relative";
             this_code.style.removeProperty("display");
-            // this_code.style.display = "box";
 
             selected = ID;
         })
@@ -281,82 +278,53 @@ function initSyntax() {
             selected = ID;
         }
     }
+    const html2 = Prism.highlight(vShader, Prism.languages.glsl, 'glsl');
+    document.getElementById("codeVertex").innerHTML = `<pre style="color:white !important">` + html2 + "</pre>";
 }
 
 
-function init() {
-    printInfo();
-        consoleError("WEBGL", "");
-        err_div.innerHTML += "<pre id=\"console\"></pre>"
-        webgl_console = document.getElementById("console");
-    
 
-    // const html = Prism.highlight(shaders[0], Prism.languages.glsl, 'glsl');
-    const html2 = Prism.highlight(vShader, Prism.languages.glsl, 'glsl');
-    initSyntax();
-    // document.getElementById("code").innerHTML       = `<pre style="color:white !important">` + html + "</pre>";
-    document.getElementById("codeVertex").innerHTML = `<pre style="color:white !important">` + html2 + "</pre>";
-
-
-    program = createProgram(vShader, shaders[0]);
-    gl.useProgram(program);
-
-    VAO = gl.createVertexArray();
-        gl.bindVertexArray(VAO);
-        glCall(new Error().lineNumber);
-
-
-    VBO = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Vertices), gl.STATIC_DRAW);
-        glCall(new Error().lineNumber);
-
-    let position = gl.getAttribLocation(program, "pos");
-        gl.enableVertexAttribArray(position);
-        glCall(new Error().lineNumber);
-
-    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 2 * sizeof_float, 0);
-        glCall(new Error().lineNumber);
-
-    // Uniforms
-    resolution_loc   = gl.getUniformLocation(program, "u_resolution");
-    offsetLocation = gl.getUniformLocation(program, "offset");
-    zoomLocation   = gl.getUniformLocation(program, "zoom");
-    rotationLocation = gl.getUniformLocation(program, "ROTATION");
-    C_ALOGRITHM = gl.getUniformLocation(program, "C_ALOGRITHM");
-    
-
-    gl.uniform2f(resolution_loc, canvas.width, canvas.height);
-    gl.uniform2f(offsetLocation, 0, 0);
-    gl.uniform1f(zoomLocation, 100.0);
-    gl.uniform1f(rotationLocation, 0.0);
-    gl.uniform1i(C_ALOGRITHM, 0);
-
-    timer = new Timer();    
-
-    function loop() {
-        gl.clear(gl.COLOR_BUFFER_BIT)
-        gl.drawArrays(gl.TRIANGLES, 0, 2 * triangle_vertices);
-        OrbitControl(timer, offsetLocation);
-
-        
-        let pos = toCartesian(mpos.x, mpos.y);
-        document.getElementById("pos_counter").innerText = `(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})`;
-        
-        if (fpsTimer.getMiliseconds() >= 1000) {
-            FPS_COUNTER.innerText = `FPS: ${frames}`;
-            frames = 0;
-            fpsTimer.restart();            
-        }
-        frames += 1;
-        timer.restart();
-        window.requestAnimationFrame(loop);
+class ProgramGL {
+    constructor(fragmentShader) {
+        this.program = createProgram(vShader, fragmentShader);
+        this.getLocations();
     }
 
+    getLocations() {
+        this.resolution_loc   = gl.getUniformLocation(this.program, "u_resolution");
+        this.offsetLocation   = gl.getUniformLocation(this.program, "offset");
+        this.zoomLocation     = gl.getUniformLocation(this.program, "zoom");
+        this.rotationLocation = gl.getUniformLocation(this.program, "ROTATION");
+    }
+
+    bind() {
+        gl.useProgram(this.program);
+        selectedProgram = this;
+    }
+
+    updateCommonUniforms() {
+        gl.uniform2f(this.resolution_loc,   canvas.width, canvas.height);
+        gl.uniform2f(this.offsetLocation,   offset.x, offset.y);
+        gl.uniform1f(this.zoomLocation,     offset.zoom);
+        gl.uniform1f(this.rotationLocation, offset.rot);
+    }
+
+    getVertexPosition() {
+        this.vertex_position = gl.getAttribLocation(this.program, "pos");
+        return this.vertex_position;
+    }
+
+    setUniform(name) {
+        this[name] = gl.getUniformLocation(this.program, name);
+    }
+
+};
+
+function MandelImgres() {
     let preview = document.getElementById("preview");
 
     for (let i=0; i < 6; i++) {
-        gl.uniform1i(C_ALOGRITHM, i);
+        gl.uniform1i(selectedProgram.C_ALOGRITHM, i);
 
         gl.clear(gl.COLOR_BUFFER_BIT)
         gl.drawArrays(gl.TRIANGLES, 0, 2 * triangle_vertices);
@@ -375,14 +343,77 @@ function init() {
         preview.appendChild(a_link);
         let ctx = elm.getContext("2d");
         elm.addEventListener("click", () => {
-            gl.uniform1i(C_ALOGRITHM, i);
+            gl.uniform1i(selectedProgram.C_ALOGRITHM, i);
         })
 
         ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 
                               0, 0, elm.width, elm.height);    
     }
 
-    gl.uniform1i(C_ALOGRITHM, 0);
+    gl.uniform1i(selectedProgram.C_ALOGRITHM, 0);
+}
+
+
+function init() {
+    printInfo();
+        consoleError("WEBGL", "");
+        err_div.innerHTML += "<pre id=\"console\"></pre>"
+        webgl_console = document.getElementById("console");
+    
+
+    initSyntax();
+
+    let MandelBrot = new ProgramGL(shaders[0]);
+    let Julia = new ProgramGL(shaders[1]);
+        MandelBrot.bind();
+    Julia.bind();
+
+
+    VAO = gl.createVertexArray();
+        gl.bindVertexArray(VAO);
+        glCall(new Error().lineNumber);
+
+
+    VBO = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Vertices), gl.STATIC_DRAW);
+        glCall(new Error().lineNumber);
+
+    gl.enableVertexAttribArray(selectedProgram.getVertexPosition());
+        glCall(new Error().lineNumber);
+
+    gl.vertexAttribPointer(selectedProgram.getVertexPosition(), 2, gl.FLOAT, false, 2 * sizeof_float, 0);
+        glCall(new Error().lineNumber);
+
+    Julia.updateCommonUniforms();
+    // MandelBrot.updateCommonUniforms();
+
+
+    // MandelBrot.setUniform("C_ALOGRITHM");
+    // gl.uniform1i(MandelBrot.C_ALOGRITHM, 0);
+    
+
+    timer = new Timer();    
+
+    function loop() {
+        gl.clear(gl.COLOR_BUFFER_BIT)
+        gl.drawArrays(gl.TRIANGLES, 0, 2 * triangle_vertices);
+        OrbitControl(timer);
+
+        
+        let pos = toCartesian(mpos.x, mpos.y);
+        document.getElementById("pos_counter").innerText = `(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})`;
+        
+        if (fpsTimer.getMiliseconds() >= 1000) {
+            FPS_COUNTER.innerText = `FPS: ${frames}`;
+            frames = 0;
+            fpsTimer.restart();            
+        }
+        frames += 1;
+        timer.restart();
+        window.requestAnimationFrame(loop);
+    }
+
 
 
     canvas.focus();

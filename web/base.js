@@ -33,8 +33,8 @@ disableError();
     }
 
     let consoleError = (header, str_err) => {
-        let id = Math.random() * Math.random();
-        err_div.innerHTML += `<pre> <code style="color: rgb(233, 74, 147)">${header}</b><hr> <div style="color: white">${style(str_err)}</div></pre>`;
+        
+        err_div.innerHTML += `<pre> <code style="color: rgb(233, 74, 147)">${header}</b><hr> <div style="color: white">${style(str_err)}</div></pre>`
     }
 
     let console_ = (str, elm=null) => {
@@ -42,8 +42,6 @@ disableError();
             webgl_console.innerHTML += `<span style="color: white">${style(str)}</span>\n`;
         } else {
             elm.innerHTML += `<span style="color: white">${style(str)}</span>\n`;
-            console.log("Elm is", elm, elm.innerHTML);
-            console.log(elm.children[0])
         }
     }
 
@@ -105,7 +103,7 @@ var shaderDIV;
     else 
         consoleError("Initialising Context...", `SUCCESS: Initialised Webgl2 Context`)
 
-    shaderDIV =consoleError("Loading Shaders...", "");
+    shaderDIV = consoleError("Loading Shaders...", "");
     err_div.innerHTML += "<pre id=\"console0\"></pre>";
     webgl_console = document.getElementById("console0");
 // END LOAD.JS
@@ -179,7 +177,8 @@ var shaderDIV;
 
         if ( !gl.getProgramParameter( program, gl.LINK_STATUS) ) {
             var info = gl.getProgramInfoLog(program);
-            consoleError('Could not compile WebGL program. ', info);
+            console_('[ERROR] Could not compile WebGL program. ');
+            console_(`[ERROR] ${info}`);
             setError("Failed to link/compile WebGL shader program, check the logs below.");
         }
         return program;
@@ -217,7 +216,8 @@ function loadShader(URL, callback) {
 let res_div = document.getElementById("res_div");
 res_div.style.width = `${window.innerWidth - 30}px`;
 
-let resolution_loc;
+var selectedProgram;
+
 
 class Vector {
     constructor(x, y) {
@@ -238,8 +238,8 @@ function resizef() {
     canvas.width  = width;
     canvas.height = height;
 
-    if (resolution_loc != undefined) {
-        gl.uniform2f(resolution_loc, width, height);
+    if (selectedProgram != undefined) {
+        gl.uniform2f(selectedProgram.resolution_loc, width, height);
         gl.viewport(0, 0, width, height);
     }
 }
@@ -247,12 +247,12 @@ function resizef() {
 function resizeCanvas(width, height) {
     mid.x = width  / 2.0;
     mid.y = height / 2.0;
-
+    
     canvas.width  = width;
     canvas.height = height;
 
-    if (resolution_loc != undefined) {
-        gl.uniform2f(resolution_loc, width, height);
+    if (selectedProgram != undefined) {
+        gl.uniform2f(selectedProgram.resolution_loc, width, height);
         gl.viewport(0, 0, width, height);
     }
 
