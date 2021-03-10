@@ -283,6 +283,62 @@ function initSyntax() {
 }
 
 
+function initFractals() {
+    let fractalList = document.getElementById("fractalList");
+    let PROG_PREVIEW = document.getElementById("PROGRAM_PREVIEW");
+
+    for (let i=0; i < shaders.length; i++) {
+        let program = new ProgramGL(shaders[i]);
+            program.bind();
+            program.updateCommonUniforms();
+        programs.push(program);
+
+
+        let func = config[i]["function"];
+        let html = config[i]["html"];
+        if (html !== undefined) {
+            let ELEMENT = document.createElement("div");
+            ELEMENT.innerHTML = html;
+    
+            PROG_PREVIEW.appendChild(ELEMENT);
+    
+        }
+
+
+        if (func !== undefined)
+            func();
+
+
+            gl.clear(gl.COLOR_BUFFER_BIT)
+            gl.drawArrays(gl.TRIANGLES, 0, 2 * triangle_vertices);
+
+            
+            let a_link = document.createElement("a");
+            a_link.href= "#";
+        
+            let elm = document.createElement("canvas");
+                elm.width = window.innerWidth / 4;
+                elm.height = 600 / 4;
+            elm.classList.add("canvas");
+    
+            a_link.appendChild(elm);
+            a_link.classList.add("col-sm");
+
+            a_link.addEventListener("click", () => {
+                programs[i].bind();
+                programs[i].updateCommonUniforms();
+            })
+    
+            fractalList.appendChild(a_link);
+
+            let ctx = elm.getContext("2d");
+    
+            ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 
+                                  0, 0, elm.width, elm.height);    
+    }
+    // programs[0].bind();
+
+}
 
 class ProgramGL {
     constructor(fragmentShader) {
@@ -300,6 +356,8 @@ class ProgramGL {
     bind() {
         gl.useProgram(this.program);
         selectedProgram = this;
+        gl.enableVertexAttribArray(selectedProgram.getVertexPosition());
+        gl.vertexAttribPointer(this.vertex_position, 2, gl.FLOAT, false, 2 * sizeof_float, 0);
     }
 
     updateCommonUniforms() {
@@ -310,6 +368,8 @@ class ProgramGL {
     }
 
     getVertexPosition() {
+        if (this.vertex_position !== undefined)
+            return this.vertex_position;
         this.vertex_position = gl.getAttribLocation(this.program, "pos");
         return this.vertex_position;
     }
@@ -320,39 +380,17 @@ class ProgramGL {
 
 };
 
-function MandelImgres() {
-    let preview = document.getElementById("preview");
 
-    for (let i=0; i < 6; i++) {
-        gl.uniform1i(selectedProgram.C_ALOGRITHM, i);
+function glInit() {
+    VAO = gl.createVertexArray();
+        gl.bindVertexArray(VAO);
+            glCall(new Error().lineNumber);
 
-        gl.clear(gl.COLOR_BUFFER_BIT)
-        gl.drawArrays(gl.TRIANGLES, 0, 2 * triangle_vertices);
-        
-        let a_link = document.createElement("a");
-        a_link.href= "#";
-    
-        let elm = document.createElement("canvas");
-            elm.width = window.innerWidth / 4;
-            elm.height = 600 / 4;
-        elm.classList.add("canvas");
-
-        a_link.appendChild(elm);
-        a_link.classList.add("col-sm");
-
-        preview.appendChild(a_link);
-        let ctx = elm.getContext("2d");
-        elm.addEventListener("click", () => {
-            gl.uniform1i(selectedProgram.C_ALOGRITHM, i);
-        })
-
-        ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 
-                              0, 0, elm.width, elm.height);    
-    }
-
-    gl.uniform1i(selectedProgram.C_ALOGRITHM, 0);
+    VBO = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Vertices), gl.STATIC_DRAW);
+            glCall(new Error().lineNumber);
 }
-
 
 function init() {
     printInfo();
@@ -362,47 +400,35 @@ function init() {
     
 
     initSyntax();
+    glInit();
+    initFractals();
 
-    let MandelBrot = new ProgramGL(shaders[0]);
-    let Julia = new ProgramGL(shaders[1]);
-        MandelBrot.bind();
-    Julia.bind();
-
-
-    VAO = gl.createVertexArray();
-        gl.bindVertexArray(VAO);
-        glCall(new Error().lineNumber);
+    programs[0].bind();
+    programs[0].updateCommonUniforms();
 
 
-    VBO = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Vertices), gl.STATIC_DRAW);
-        glCall(new Error().lineNumber);
-
-    gl.enableVertexAttribArray(selectedProgram.getVertexPosition());
-        glCall(new Error().lineNumber);
-
-    gl.vertexAttribPointer(selectedProgram.getVertexPosition(), 2, gl.FLOAT, false, 2 * sizeof_float, 0);
-        glCall(new Error().lineNumber);
-
-    Julia.updateCommonUniforms();
-    // MandelBrot.updateCommonUniforms();
-
-
-    // MandelBrot.setUniform("C_ALOGRITHM");
-    // gl.uniform1i(MandelBrot.C_ALOGRITHM, 0);
+    document.addEventListener("keyup", (e) => {
+        if (e.key.toLowerCase() === "g") {
+            MandelBrot.bind();
+            MandelBrot.updateCommonUniforms();
+        }
+        else if (e.key.toLowerCase() === "h") {
+            Julia.bind();
+            Julia.updateCommonUniforms();
+        }
+    })
     
 
     timer = new Timer();    
+    let pos_counter = document.getElementById("pos_counter");
 
     function loop() {
         gl.clear(gl.COLOR_BUFFER_BIT)
         gl.drawArrays(gl.TRIANGLES, 0, 2 * triangle_vertices);
         OrbitControl(timer);
 
-        
         let pos = toCartesian(mpos.x, mpos.y);
-        document.getElementById("pos_counter").innerText = `(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})`;
+        pos_counter.innerText = `(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})`;
         
         if (fpsTimer.getMiliseconds() >= 1000) {
             FPS_COUNTER.innerText = `FPS: ${frames}`;
@@ -418,9 +444,8 @@ function init() {
 
     canvas.focus();
     attachListeners();
+    finishLoading();
     timer.restart();    
     fpsTimer.restart();
-
     loop();
 }
-

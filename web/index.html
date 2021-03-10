@@ -7,6 +7,9 @@
     <link href="./style.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism.css " rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-dark.css" rel="stylesheet">
+<script>
+  window.onScriptExecute = function() {};
+</script>
 
 <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous"> -->
 <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script> -->
@@ -16,6 +19,11 @@
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+   -->
 
     <title>Mandelbrot Explorer</title>
 </head>
@@ -27,11 +35,13 @@
   </div>
   <noscript>
     <div style="margin: 10px; background-color: rgb(67, 12, 17); border-color: rgb(106, 17, 26); color: rgb(223, 122, 131);" class="alert alert-danger" role="alert">
-      It seems like your browser does cannot execute JavaScript or it's been disabled.
-      This page cannot function without JavaScript, you'll have to enable it.
+      It seems like your browser cannot execute JavaScript or it's been disabled.
+      This page does not work without JavaScript, you'll have to enable it.
     </div>  
   
   </noscript>
+
+  <!-- Coordinate Text -->
   <div style="
   width: 100px; height: 40px;
   position: absolute;
@@ -113,17 +123,26 @@
 
     <div style="user-select: none; pointer-events: none;font-family: 'Courier New', Courier, monospace; font-size: 25px; position: absolute; right: 50px; margin-top: 10px; color: white;" id="pos_counter">(0, 0)</div>
 
-
     <div id="res_div" style="overflow: auto; position: absolute;width: 800px; height: 600px; resize: horizontal; background-color: transparent"></div>
 
-    
-    <canvas width="800" height="600" id="canvas">
-      <div style="margin: 10px; background-color: rgb(67, 12, 17); border-color: rgb(106, 17, 26); color: rgb(223, 122, 131);" class="alert alert-danger" role="alert">
-        It seems like your browser does not support the HTML canvas element.
-        You can find the list of supported browsers <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#browser_compatibility">here</a>.
-      </div>  
-    </canvas>
 
+    <div class="d-flex justify-content-center" style="position: relative;">
+      <div id="spinner" style="position: absolute;
+      top: 40%;
+      justify-content: center;
+      width: 150px; height: 150px;
+      " class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+      <canvas width="800" height="600" id="canvas">
+        <div style="margin: 10px; background-color: rgb(67, 12, 17); border-color: rgb(106, 17, 26); color: rgb(223, 122, 131);" class="alert alert-danger" role="alert">
+          It seems like your browser does not support the HTML canvas element.
+          You can find the list of supported browsers <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#browser_compatibility">here</a>.
+        </div>  
+      </canvas>  
+    </div>
+
+    
     <ul style="margin-top: 50px; margin-left: 20px;" class="nav nav-pills nav-fill">
         <li class="nav-item">
           <a for="errors" class="nav-link active" aria-current="page" href="#">Console Output</a>
@@ -140,12 +159,23 @@
       </ul>
 
   
+  
     <div style="margin: 50px;"></div>
+
     
     <select ID="SELECT" style="margin-left: 10px;width: 200px; background-color: rgb(24, 26, 27);border-color: rgb(60, 65, 68);color: rgb(233, 74, 147);" class="custom-select">
     </select>
     
     <hr >
+
+    <code style="margin-left: 20px; font-weight: 500;">Fractals</code>
+    <hr>
+
+    <!-- Fractal list -->
+    <div class="row d-flex justify-content-start" id="fractalList">
+
+    </div>
+
 
     <div style="background-color: rgb(0, 0, 0); border: 10px hidden green; padding: 10px;" id="errors"></div>
     <div  style="color: white !important; margin-left: 50px;" id="code"></div>
@@ -154,239 +184,12 @@
     <code style="margin-left: 20px; font-weight: 500;">Coloring Algorithms</code>
     <hr>
 
-    <div style="margin-top: 50px;" class="row" id="preview">
+    <div id="PROGRAM_PREVIEW">
 
     </div>
 
 
-    <div style="width: 400px; height: 400px;margin-left: 20px;">
-      <div id="circle"
-      style="width: 20px; height: 20px;
-          pointer-events: none;
-          user-select: none;
-          position: absolute; 
-          background-color: rgb(68, 68, 223); border-radius: 50px; border: 2px solid rgb(223, 12, 177);"></div>
-
-      <div id="x_y_cords" style="position: absolute; font-size: 20px; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
-        (x, y)
-      </div>
-
-      <canvas id="cords_canvas" width="400px" height="400px">    
-    </div>
     <br>
-
-
-    </canvas>
-    <script>
-      function canvas_draw() {
-        let CORD_CANVAS = document.getElementById("cords_canvas");
-        let ctx = CORD_CANVAS.getContext("2d");
-        let w = CORD_CANVAS.width;
-        let h = CORD_CANVAS.height;
-
-        let circle = document.getElementById("circle");
-
-        function createGradient() {
-          let grd = ctx.createLinearGradient(0, 0, 200, 0);
-            grd.addColorStop(0, "rgba(19, 118, 138, 1)");
-            grd.addColorStop(1, "rgba(107, 3, 107, 1)");
-            grd.addColorStop(0, "rgba(19, 62, 89, 1)");
-          return grd;
-        }
-
-
-        let grd = createGradient();
-        let X_END = 2;
-        let zoom = (w - (w/2)) / X_END;
-        let x_y_cords = document.getElementById("x_y_cords");
-
-        function MapCords(x, y) {
-          return [w / 2 + x * zoom, h / 2 - y * zoom]
-        }
-        // px = w / 2 + x * zoom
-        // py = h / 2 - y * zoom
-
-        //  ( px - (w / 2) ) / zoom
-        // -( py - (h / 2) ) / zoom
-  
-        function unMapCords(pX, pY) {
-          return [
-          ( pX - (w / 2) ) / zoom, -( pY - (h / 2) ) / zoom
-          ]
-        }
-
-
-        let abs = Math.abs;
-        function drawLinesX(END, inc=0.3) {
-          for (let i=0; abs(i) < abs(END + inc); i += inc) {
-            let X = MapCords(i, 0)[0];
-            ctx.moveTo(X, h);
-            ctx.lineTo(X, 0);
-          }
-        }
-
-
-        function drawLinesY(inc=0.3) {
-          for (let y=0; y < X_END; y+=inc) {
-            let map = MapCords(0, y);
-            ctx.moveTo(0, map[1]);
-            ctx.lineTo(w, map[1])
-          }
-
-          for (let y=0; y > -X_END; y-=inc) {
-            let map = MapCords(0, y);
-            ctx.moveTo(0, map[1]);
-            ctx.lineTo(w, map[1])
-          }
-
-        }
-
-
-        function drawTextX(x) {
-          let map = MapCords(x, 0);
-          let fWidth = 10;
-          ctx.font = `${fWidth}px Arial`;
-          ctx.fillStyle = "white";
-          ctx.fillText(`${x.toFixed(1)}`, (map[0] - fWidth / 2) , (map[1] + fWidth + 2));
-        }
-
-
-        function drawTextY(y) {
-          if (y == 0)
-            return;
-          let map = MapCords(0, y);
-          let fWidth = 10;
-          ctx.font = `${fWidth}px Arial`;
-          ctx.fillStyle = "white";
-          ctx.fillText(`${y.toFixed(1)}`, map[0] - fWidth / 2 - 2 , (map[1] + fWidth + 2));
-        }
-
-
-        function drawText(inc=0.3) {
-          for (let x=0; x < X_END + 1; x+=2*inc) {
-            drawTextX(x);
-          }
-
-          for (let x=0; x > -X_END - 1; x -= 2 * inc) {
-            drawTextX(x);
-          }
-
-          for (let y=0; y < X_END + 1; y += 2 * inc) {
-            drawTextY(y);
-          }
-
-          for (let y=0; y > -X_END - 1; y -= 2 * inc) {
-            drawTextY(y);
-          }
-        }
-
-
-        function drawCross() {
-          ctx.beginPath();
-            ctx.strokeStyle = "rgb(61, 54, 61)";
-            ctx.lineWidth = 2;
-            ctx.moveTo(...MapCords(-X_END, 0));
-              ctx.lineTo(...MapCords(X_END, 0));
-            
-              ctx.moveTo(...MapCords(0,-X_END));        
-              ctx.lineTo(...MapCords(0, X_END));
-
-            ctx.stroke();
-          ctx.closePath();
-
-        }
-
-        function drawAxis() {
-          ctx.beginPath();
-            ctx.strokeStyle = grd;
-            drawLinesX(X_END);
-            drawLinesX(-X_END, -.3);
-            drawLinesY();
-            ctx.stroke();
-          ctx.closePath();
-        }
-        
-        function parse(pos) {
-          return Number(pos.split("p", 1)[0]);
-        }
-
-        function getCirclePos() {
-          let delta = CORD_CANVAS.getBoundingClientRect();
-
-          let x = circle.offsetLeft - delta.x;
-          let y = circle.offsetTop - CORD_CANVAS.offsetTop;
-          return [x + circle.offsetWidth / 2, y + circle.offsetHeight / 2];
-        }
-
-        function render() {
-          ctx.clearRect(0, 0, w, h);
-          drawAxis();
-          drawCross();
-          drawText();
-          let pos = getCirclePos();
-          drawLine(MapCords(0, 0), pos);
-          let [x, y] = unMapCords(...pos);
-          x_y_cords.innerText = `(${x.toFixed(2)}, ${y.toFixed(2)})`
-
-        }
-
-        function drawLine(P0, P1) {
-          ctx.beginPath();
-            ctx.strokeStyle = "yellow";
-            ctx.moveTo(...P0);
-            ctx.lineTo(...P1);
-          ctx.stroke();
-          ctx.closePath();
-        }
-
-        render();
-
-        CORD_CANVAS.addEventListener("wheel", (e) => {
-          e.preventDefault();
-          if (e.deltaY > 0) {
-            X_END += 0.1;
-            circle.style.width = `${  Number(circle.style.width.split("p")[0]) - 0.1}px`
-            circle.style.height = `${ Number(circle.style.height.split("p")[0]) - 0.1}px`
-
-          }
-          else {
-            X_END -= 0.1;
-            circle.style.width = `${  Number(circle.style.width.split("p")[0])  + 0.1}px`
-            circle.style.height = `${ Number(circle.style.height.split("p")[0]) + 0.1}px`
-
-          }
-
-          zoom = (w - (w/2)) / X_END;
-          render();
-        })
-
-        let mouseDown = false;
-        
-        CORD_CANVAS.addEventListener("mousedown", () => mouseDown = true);
-        CORD_CANVAS.addEventListener("mouseup", () => mouseDown = false);
-
-        CORD_CANVAS.addEventListener("mousemove", (e) => {
-          if (!mouseDown)
-            return;
-
-          let delta = e.target.getBoundingClientRect();
-          let [x, y] = [e.x - delta.x, e.y - delta.y];
-
-          let cX = Number( circle.style.width.split("p", 1)[0]  );
-          let cY = Number( circle.style.height.split("p", 1)[0] );
-
-          circle.style.marginLeft = `${x - cX / 2}px`;
-          circle.style.marginTop  = `${y - cY / 2}px`;
-          
-          render();
-        })
-
-      }
-
-      canvas_draw();
-
-  </script>
-
     
 </body>
 </html>

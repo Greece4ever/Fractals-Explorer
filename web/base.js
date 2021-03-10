@@ -8,6 +8,13 @@ void main() {
 }
 `.trim();
 
+function finishLoading() {
+    canvas.parentElement.style.removeProperty("position");
+    canvas.parentElement.className = "none";
+    let spinner = document.getElementById("spinner");
+    spinner.remove();
+}
+
 
 let err_div_log = document.getElementById("ERROR_COMPILATION");
 
@@ -185,10 +192,10 @@ var shaderDIV;
     }
 // END GL_WRAPPER.JS
 
-function loadShader(URL, callback) {
+function loadShader(URL, callback, type="Shader") {
     let a = new XMLHttpRequest();
     let ID = Math.random();
-    let ELM = `[INFO] Loading Shader from <b style="color: green">"${URL}"</b> <b id="${ID}">0%</b>`
+    let ELM = `[INFO] Loading ${type} from <b style="color: green">"${URL}"</b> <b id="${ID}">0%</b>`
     console_(ELM);
     let ELEMENT = document.getElementById(ID.toString());
 
@@ -272,22 +279,45 @@ window.addEventListener("resize", () => {
 var fShader;
 
 let shader_paths = [
-    './fragment.glsl',
-    './julia.glsl',
+    'mandel',
+    'julia',
 ]
 
 let shaders = [];
+let config = [];
+let programs = [];
+
+var CURRENT_CONFIG;
 
 let SID = 0;
 function load_shaders() {
-    loadShader(shader_paths[SID], (shader_resp) => {
+    let name = shader_paths[SID];
+    let SHADER_URL = `./shaders/${name}.glsl`;
+    let JS_URL = `./components/${name}.js`
+
+    loadShader(SHADER_URL, (shader_resp) => {
         shaders.push(shader_resp);
-        if (SID !== shader_paths.length - 1) {
-            SID++;
-            return load_shaders();
-        } else {
-            init();
-        }
+        loadShader(JS_URL, (resp) => {
+            let script = document.createElement("script");            script.onparse
+            script.async = true;
+
+            window.onScriptExecute = function() {
+                config.push(CURRENT_CONFIG);
+                if (SID !== shader_paths.length - 1) {
+                    SID++;
+                    return load_shaders();
+                } else {
+                    init();
+                }
+            }
+            script.addEventListener("error", () => {
+                setError(`Execution of JavaScript file ${JS_URL} failed.`);
+            })
+
+            script.appendChild(document.createTextNode(resp + `\nwindow.onScriptExecute()`));
+            document.body.appendChild(script);
+        }, "JS File")
+
     })
 }
 
