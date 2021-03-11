@@ -15,6 +15,14 @@ function finishLoading() {
     spinner.remove();
 }
 
+function finishLoadingButNoError() {
+    // canvas.parentElement.style.removeProperty("position");
+    // canvas.parentElement.className = "none";
+    let spinner = document.getElementById("spinner");
+    spinner.remove();
+}
+
+
 
 let err_div_log = document.getElementById("ERROR_COMPILATION");
 
@@ -24,8 +32,10 @@ function disableError() {
 }
 
 function setError(str) {
+    ERR_ICON.style.removeProperty("display");
+
     err_div_log.style.visibility = "visible";
-    err_div_log.style.position = "relative";
+    err_div_log.style.position   = "relative";
     err_div_log.children[0].innerHTML = str;
 }
 
@@ -282,10 +292,15 @@ let shader_paths = [
     'mandel',
     'julia',
 ]
+window.addEventListener("error", (e) => {
+    finishLoadingButNoError();
+    setError("Something went wrong, check the JavaScript Console.<br>" + "What went wrong: <b>" + e.error + "</b>");
+})
 
 let shaders = [];
 let config = [];
 let programs = [];
+let active_preview;
 
 var CURRENT_CONFIG;
 

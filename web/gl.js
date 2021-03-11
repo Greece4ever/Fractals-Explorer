@@ -226,9 +226,6 @@ function OrbitControl(timer) {
     }
 
     selectedProgram.updateCommonUniforms();
-    // gl.uniform2f(offsetLocation,   offset.x, offset.y);
-    // gl.uniform1f(zoomLocation,     offset.zoom);
-    // gl.uniform1f(rotationLocation, offset.rot );
 }
 
 
@@ -287,33 +284,48 @@ function initFractals() {
     let fractalList = document.getElementById("fractalList");
     let PROG_PREVIEW = document.getElementById("PROGRAM_PREVIEW");
 
+    let first;
     for (let i=0; i < shaders.length; i++) {
         let program = new ProgramGL(shaders[i]);
             program.bind();
-            program.updateCommonUniforms();
-        programs.push(program);
+
+        for (let k=0; k < config[i]["uniforms"].length; k++) {
+            let u_name = config[i]["uniforms"][k];
+            program.uniforms[u_name] = gl.getUniformLocation(program.program, u_name);
+        }
 
 
         let func = config[i]["function"];
         let html = config[i]["html"];
-        if (html !== undefined) {
-            let ELEMENT = document.createElement("div");
-            ELEMENT.innerHTML = html;
-    
-            PROG_PREVIEW.appendChild(ELEMENT);
-    
+        if (html === undefined)
+            html = "";
+
+
+        let ELEMENT = document.createElement("div");
+        ELEMENT.innerHTML = html;
+
+        PROG_PREVIEW.appendChild(ELEMENT);
+
+        if (i !== 0) {
+            ELEMENT.style.display = "none";
+        } else {
+            active_preview = ELEMENT;
         }
 
-
         if (func !== undefined)
-            func();
+            func(program);
+
+
+        program.updateCommonUniforms();
+        programs.push(program);
 
 
             gl.clear(gl.COLOR_BUFFER_BIT)
             gl.drawArrays(gl.TRIANGLES, 0, 2 * triangle_vertices);
 
-            
             let a_link = document.createElement("a");
+            
+
             a_link.href= "#";
         
             let elm = document.createElement("canvas");
@@ -327,7 +339,12 @@ function initFractals() {
             a_link.addEventListener("click", () => {
                 programs[i].bind();
                 programs[i].updateCommonUniforms();
-            })
+                
+                active_preview.style.display = "none";
+                
+                active_preview = ELEMENT;
+                active_preview.style.removeProperty("display");
+            });
     
             fractalList.appendChild(a_link);
 
@@ -344,6 +361,7 @@ class ProgramGL {
     constructor(fragmentShader) {
         this.program = createProgram(vShader, fragmentShader);
         this.getLocations();
+        this.uniforms = {};
     }
 
     getLocations() {
@@ -375,9 +393,29 @@ class ProgramGL {
     }
 
     setUniform(name) {
-        this[name] = gl.getUniformLocation(this.program, name);
+        this.uniforms[name] = gl.getUniformLocation(this.program, name);
     }
 
+    pushUniform2f(name, x, y) {
+        gl.uniform2f(this.uniforms[name], x, y);
+    }
+
+    pushUniform1f(name, x) {
+        gl.uniform1f(this.uniforms[name], x);
+    }
+
+    pushUniform1i(name, x) {
+        gl.uniform1i(this.uniforms[name], x);
+    }
+
+    pushUniform3f(name, x, y, z) {
+        gl.uniform3f(this.uniforms[name], x, y, z);
+    }
+
+
+    getUniform(name) {
+        return this.uniforms[name];
+    }
 };
 
 
@@ -405,18 +443,6 @@ function init() {
 
     programs[0].bind();
     programs[0].updateCommonUniforms();
-
-
-    document.addEventListener("keyup", (e) => {
-        if (e.key.toLowerCase() === "g") {
-            MandelBrot.bind();
-            MandelBrot.updateCommonUniforms();
-        }
-        else if (e.key.toLowerCase() === "h") {
-            Julia.bind();
-            Julia.updateCommonUniforms();
-        }
-    })
     
 
     timer = new Timer();    

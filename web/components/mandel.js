@@ -1,5 +1,9 @@
 // mandel_exports
-let mandel_exports = {"name" : "Mandelbrot"};
+let mandel_exports = {
+    "name" : "Mandelbrot", 
+    "uniforms": [],
+    "html" : ""
+};
 
 let myVar = 5;
 
@@ -37,4 +41,3 @@ function MandelImgres() {
 }
 
 CURRENT_CONFIG = mandel_exports;
-console.log("hello", CURRENT_CONFIG)

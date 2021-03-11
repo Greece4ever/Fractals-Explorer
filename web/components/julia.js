@@ -1,15 +1,18 @@
 // julia_exports
 
-let julia_exports = {"name" : "Julia", "function" : null, "html" : null};
+let julia_exports = {
+  "name" : "Julia", "function" : null,
+  "html" : null, 
+  "uniforms" : ["c_start", "escape_radius", "iterations", "RGB"]
+};
 
 
-julia_exports["function"] = function() {
+julia_exports["function"] = function(program) {
     let CORD_CANVAS = document.getElementById("cords_canvas");
     let ctx = CORD_CANVAS.getContext("2d");
     let sliders = Array.from( document.getElementsByClassName("slider"));
     let w = CORD_CANVAS.width;
-    let h = CORD_CANVAS.height;
-
+    let h = CORD_CANVAS.height;    
 
     function createGradient() {
       let grd = ctx.createLinearGradient(0, 0, 200, 0);
@@ -18,7 +21,6 @@ julia_exports["function"] = function() {
         grd.addColorStop(0, "rgba(19, 62, 89, 1)");
       return grd;
     }
-
 
     let grd = createGradient();
     let X_END = 2;
@@ -36,6 +38,11 @@ julia_exports["function"] = function() {
     }
 
     let circle_pos = [0, 0];
+    let pix = 30;
+
+    let UNIT = unMapCords( (w/2) + pix, 0)[0];
+
+
 
     let abs = Math.abs;
     function drawLinesX(END, inc=0.3) {
@@ -96,19 +103,21 @@ julia_exports["function"] = function() {
 
 
     function drawText(inc=0.3) {
-      for (let x=0; x < X_END + 1; x+=2*inc) {
+      INC = 2*(UNIT);
+
+      for (let x=0; x < X_END + 1; x+=INC) {
         drawTextX(x);
       }
 
-      for (let x=0; x > -X_END - 1; x -= 2 * inc) {
+      for (let x=0; x > -X_END - 1; x -= INC) {
         drawTextX(x);
       }
 
-      for (let y=0; y < X_END + 1; y += 2 * inc) {
+      for (let y=0; y < X_END + 1; y += INC) {
         drawTextY(y);
       }
 
-      for (let y=0; y > -X_END - 1; y -= 2 * inc) {
+      for (let y=0; y > -X_END - 1; y -= INC) {
         drawTextY(y);
       }
     }
@@ -138,7 +147,14 @@ julia_exports["function"] = function() {
         ctx.stroke();
       ctx.closePath();
     }
-    
+
+  function hexToRGB(hexColor){
+    return {
+      red: (hexColor >> 16) & 0xFF,
+      green: (hexColor >> 8) & 0xFF,  
+      blue: hexColor & 0xFF,
+    }
+  }    
 
     function render() {
       ctx.clearRect(0, 0, w, h);
@@ -150,8 +166,6 @@ julia_exports["function"] = function() {
       drawLine(MapCords(0, 0), [x, y]);
       x_y_cords.innerText = `(${circle_pos[0].toFixed(2)} + ${circle_pos[1].toFixed(2)}i)`
       drawCircle(x, y);
-      console.log(unMapCords( (w/2) +1, 0)[0]);
-
     }
 
     function drawLine(P0, P1) {
@@ -163,15 +177,26 @@ julia_exports["function"] = function() {
       ctx.closePath();
     }
 
-
+    let add = 0;
     CORD_CANVAS.addEventListener("wheel", (e) => {
       e.preventDefault();
       if (e.deltaY > 0) 
         X_END += 0.1;
-      else 
+      else {
         X_END -= 0.1;
+        if (X_END == 0)
+            X_END = 0.1;
+      }
 
       zoom = (w - (w/2)) / X_END;
+
+    if (add > 10) {
+      UNIT = unMapCords( (w/2) + pix, 0)[0];
+      add = 0;
+    }
+    else
+      add++;
+      
       render();
     })
 
@@ -188,17 +213,40 @@ julia_exports["function"] = function() {
       let [x, y] = [e.x - delta.x, e.y - delta.y];
 
       circle_pos = unMapCords(x, y);
-      
+      program.pushUniform2f("c_start", ...circle_pos);
       render();
     })
 
     sliders.forEach(slider => {
-      slider.addEventListener("input", () => {
-        console.log("chnge")
+      slider.addEventListener("input", (e) => {
+        let el = e.target;
+        let name = el.getAttribute("uniform");
+        let value = Number( e.target.value );
+
+        console.log(e.target.value);
+        if (el.getAttribute("type") === "color") {
+          let num = "0x" + e.target.value.split("#")[1]
+          let RGB = hexToRGB(parseInt(num));
+          program.pushUniform3f(name, RGB.red / 255, RGB.green / 255, RGB.blue/255);
+          return;
+        }
+
+
+        if (el.getAttribute("type_") === "int") {
+          program.pushUniform1i(name, value);  
+        } else {
+          program.pushUniform1f(name, value);
+        }
       })
+
     })
 
     circle_pos = [-0.78, 0.13];
+    program.pushUniform2f("c_start", ...circle_pos);    
+    program.pushUniform1f("escape_radius", 20.0);
+    program.pushUniform1i("iterations", 500);
+    program.pushUniform3f("RGB", 1.0, 1.0, 1.0);
+    
     render();
 }
 
@@ -214,18 +262,19 @@ julia_exports["html"] = `
     <div style="margin-left: 40px; margin-right: 20px;width: 90%; color: #e83e8c; max-width: 400px;">
         <div>
             <label for="customRange1" class="form-label">Escape Radius</label>
-            <input class="slider" style="background-color: transparent;" type="range" class="form-range" id="customRange1">
+            <input min="0" max="100" uniform="escape_radius" value="20" class="slider" style="background-color: transparent;" type="range" class="form-range" id="customRange1">
         </div>
 
         <div>
             <label for="customRange1" class="form-label">Iterations</label>
-            <input class="slider" style="background-color: transparent;" type="range" class="form-range" id="customRange1">
+            <input type_="int" uniform="iterations" min="0" max="1000" value="500" class="slider" style="background-color: transparent;" type="range" class="form-range" id="customRange1">
         </div>
 
         <div>
-            <label for="customRange1" class="form-label">Rotation</label>
-            <input class="slider" style="background-color: transparent;" type="range" class="form-range" id="customRange1">
+            <label for="customRange1" class="form-label">Color multiplier</label>
+            <input uniform="RGB" min="0" max="1000" value="500" class="slider form-control" style="background-color: transparent;" type="color" class="form-range" id="customRange1">
         </div>
+
 
     </div>
 </div>
