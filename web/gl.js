@@ -297,14 +297,39 @@ function initFractals() {
 
         let func = config[i]["function"];
         let html = config[i]["html"];
-        if (html === undefined)
-            html = "";
+        let wasNull = false;
+        
 
 
         let ELEMENT = document.createElement("div");
-        ELEMENT.innerHTML = html;
 
-        PROG_PREVIEW.appendChild(ELEMENT);
+
+        if (!html) {
+            wasNull = true;
+            html = "";
+        }
+        else {
+            if (typeof html === "string")
+                ELEMENT.innerHTML =  html;
+            else
+                ELEMENT.appendChild(html);
+
+            PROG_PREVIEW.appendChild(ELEMENT);
+        }            
+
+
+        if (func !== undefined) {
+            func(program);
+            if (wasNull) {
+                html = config[i]["html"];
+                if (typeof html === "string")
+                    ELEMENT.innerHTML =  html;
+                else
+                    ELEMENT.appendChild(html);
+                PROG_PREVIEW.appendChild(ELEMENT);
+            }
+        }
+
 
         if (i !== 0) {
             ELEMENT.style.display = "none";
@@ -312,8 +337,6 @@ function initFractals() {
             active_preview = ELEMENT;
         }
 
-        if (func !== undefined)
-            func(program);
 
 
         program.updateCommonUniforms();

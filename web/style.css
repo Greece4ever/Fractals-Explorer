@@ -26,6 +26,10 @@ hr {
   scroll-behavior: smooth !important;
 }
 
+.scrollX {
+  overflow-x: auto !important;
+}
+
 html {
 overflow: scroll;
 overflow-x: hidden;
@@ -190,3 +194,4 @@ background: transparent;  /* Optional: just make scrollbar invisible */
     }
   }
   
+

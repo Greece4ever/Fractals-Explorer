@@ -32,6 +32,7 @@ function disableError() {
 }
 
 function setError(str) {
+    gl.clear(gl.COLOR_BUFFER_BIT)
     ERR_ICON.style.removeProperty("display");
 
     err_div_log.style.visibility = "visible";
