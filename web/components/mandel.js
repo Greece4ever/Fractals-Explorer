@@ -11,8 +11,6 @@ mandel_exports["function"] = function(program) {
     let preview = document.createElement("div");
         preview.className = "scrollX d-flex justify-content-start";
         preview.style.marginBottom = "20px";
-        // preview.style.overflowX = "auto !important";
-        // preview.test = "123"
     
     program.bind();
     program.updateCommonUniforms();

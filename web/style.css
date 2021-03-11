@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho&display=swap');
+
 hr {
   border: 1px solid rgb(17, 6, 114) !important;
   border-radius: 5px !important;
@@ -194,4 +196,9 @@ background: transparent;  /* Optional: just make scrollbar invisible */
     }
   }
   
-
+.cvs {
+  border: 1px solid rgb(133, 50, 128);
+  background-color: black !important;
+  margin-top: 10px;
+  margin-left: 10px;
+}
