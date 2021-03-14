@@ -8,7 +8,9 @@ let julia_exports = {
 };
 
 
-
+julia_exports["title"] = `The Julia Set`;
+julia_exports["description"] = `For every complex $$z_0$$ continue the sequence $$z_{n+1} = z_{n}^k + c $$, where $$c$$ and $$k$$ are variable complex numbers and,
+up to $$Q$$ iterations until $$|z_n| > r$$ where $$r$$ is the escape radius (also variable) or $$Q$$ iterations have been reached. Generlization of the Mandelbrot set`;
 
 julia_exports.helper.M2D = function(onStart, onMouseMove, onRender, setZoom=null) {
     //let CORD_CANVAS = document.getElementById("cords_canvas");
@@ -211,7 +213,6 @@ julia_exports["function"] = function(program) {
   program.pushUniform3f("RGB", 1.0, 1.0, 1.0);
 
   let canvRow = document.getElementById("canvases");
-  console.log(program);
 
   function drawLine(ctx, P0, P1) {
     ctx.beginPath();

@@ -6,6 +6,9 @@ let mandel_exports = {
     "html" : null
 };
 
+mandel_exports["title"] = `The Mandelbrot Set`;
+mandel_exports["description"] = `For each $$(x, y)$$ points continue the sequence $$z_{n+1} = z_n^2 + c$$, (where $$z_0 = 0$$, and <b style="color: red">$$c = x+yi$$</b>), up to $$k$$ iterations until $$ |z_n| > 2 $$ or $$k$$ iterations have been reached. Then generate an RGB color from the total iterations (e.g $$rgb(0, \\frac{i}{k}*255$$, 0) where $$i$$ is the total iterations)`;
+
 
 mandel_exports["function"] = function(program) {
     let preview = document.createElement("div");
@@ -14,7 +17,6 @@ mandel_exports["function"] = function(program) {
     
     program.bind();
     program.updateCommonUniforms();
-    console.log("hello1")
 
     for (let i=0; i < 6; i++) {
         // gl.uniform1i(selectedProgram.C_ALOGRITHM, i);

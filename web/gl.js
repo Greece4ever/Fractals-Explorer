@@ -167,7 +167,7 @@ function OrbitControl(timer) {
         offset.y += velocity * timer.getElapsedTime();
     }
 
-    let z_pressed = isKeyPressed("z");
+    let z_pressed = isKeyPressed("shift");
     let x_pressed = isKeyPressed("x");
 
     if (z_pressed || x_pressed) {
@@ -197,15 +197,12 @@ function OrbitControl(timer) {
         offset.zoomVelocity += 500.0;
     }
 
-    if (isKeyPressed("k")) {
+    if (isKeyPressed("e")) {
         offset.zoomVelocity *= 2;
     }
 
 
-    if (isKeyPressed("e")) {
-        offset.zoomVelocity -= 500.0;
-    }
-    if (isKeyPressed("l")) {
+    if (isKeyPressed("r")) {
         offset.zoomVelocity /= 2;
     }
 
@@ -297,6 +294,7 @@ function initFractals() {
 
         let func = config[i]["function"];
         let html = config[i]["html"];
+        // let desc = 
         let wasNull = false;
         
 
@@ -355,6 +353,15 @@ function initFractals() {
                 elm.width = window.innerWidth / 4;
                 elm.height = 600 / 4;
             elm.classList.add("canvas");
+
+            
+            // Tooltip
+                elm.setAttribute("data-toggle", "tooltip");
+                elm.setAttribute("data-html", "true");
+
+            
+            let full_text = `<b style="color: #60adff">${config[i]["title"]}</b><br>${replaceMath(config[i]["description"])}`
+            elm.setAttribute("title", full_text);
     
             a_link.appendChild(elm);
             a_link.classList.add("col-sm");
@@ -496,5 +503,6 @@ function init() {
     finishLoading();
     timer.restart();    
     fpsTimer.restart();
+    held_keys["shift"] = false;
     loop();
 }
