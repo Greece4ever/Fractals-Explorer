@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho&display=swap');
+
+hr {
+  border: 1px solid rgb(17, 6, 114) !important;
+  border-radius: 5px !important;
+}
+
+@keyframes colors {
+  25% { border-top-color: rgb(134, 15, 15); }
+  50% { border-right-color: rgb(134, 15, 15); }
+  75% { border-bottom-color: rgb(134, 15, 15); }
+  100% { border-left-color: rgb(134, 15, 15); }
+}
+
+.canvas {
+  border: 3px solid rgb(16, 16, 107);
+  border-radius: 10px;
+  margin: 10px;
+}
+
+.canvas:hover {
+  opacity: 0.5;
+  cursor: pointer;
+  animation: colors 2s infinite linear;
+}
+
+* {
+  scroll-behavior: smooth !important;
+}
+
+.scrollX {
+  overflow-x: auto !important;
+}
+
+html {
+overflow: scroll;
+overflow-x: hidden;
+} 
+
+::-webkit-scrollbar {
+width: 0;  /* Remove scrollbar space */
+background: transparent;  /* Optional: just make scrollbar invisible */
+}
+
+/* The container must be positioned relative: */
+ .custom-select {
+    position: relative;
+    font-family: Arial;
+    background-color: rgb(24, 26, 27);
+    border-color: rgb(60, 65, 68);
+  }
+  
+  .custom-select select {
+    display: none; /*hide original SELECT element: */
+  }
+  
+  .select-selected {
+    background-color: DodgerBlue;
+  }
+  
+  /* Style the arrow inside the select element: */
+  .select-selected:after {
+    position: absolute;
+    content: "";
+    top: 14px;
+    right: 10px;
+    width: 0;
+    height: 0;
+    border: 6px solid transparent;
+    border-color: #fff transparent transparent transparent;
+  }
+  
+  /* Point the arrow upwards when the select box is open (active): */
+  .select-selected.select-arrow-active:after {
+    border-color: transparent transparent #fff transparent;
+    top: 7px;
+  }
+  
+  /* style the items (options), including the selected item: */
+  .select-items div,.select-selected {
+    color: #ffffff;
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+    cursor: pointer;
+  }
+  
+  /* Style items (options): */
+  .select-items {
+    position: absolute;
+    background-color: DodgerBlue;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 99;
+  }
+  
+  /* Hide the items when the select box is closed: */
+  .select-hide {
+    display: none;
+  }
+  
+  .select-items div:hover, .same-as-selected {
+    background-color: rgba(0, 0, 0, 0.1);
+  } 
+
+
+  input[type=range] {
+    width: 100%;
+    margin: 10.5px 0;
+    background-color: transparent;
+    -webkit-appearance: none;
+  }
+  input[type=range]:focus {
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    background: rgba(255, 113, 169, 0.78);
+    border: 3.2px solid #00010f;
+    border-radius: 25px;
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    margin-top: -13.7px;
+    width: 25px;
+    height: 25px;
+    background: #372440;
+    border: 3.2px solid rgba(255, 184, 255, 0.6);
+    border-radius: 50px;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+  input[type=range]:focus::-webkit-slider-runnable-track {
+    background: #ffffff;
+  }
+  input[type=range]::-moz-range-track {
+    background: rgba(255, 113, 169, 0.78);
+    border: 3.2px solid #00010f;
+    border-radius: 25px;
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: #372440;
+    border: 3.2px solid rgba(255, 184, 255, 0.6);
+    border-radius: 50px;
+    cursor: pointer;
+  }
+  input[type=range]::-ms-track {
+    background: transparent;
+    border-color: transparent;
+    border-width: 25.5px 0;
+    color: transparent;
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+  }
+  input[type=range]::-ms-fill-lower {
+    background: #71002d;
+    border: 3.2px solid #00010f;
+    border-radius: 50px;
+  }
+  input[type=range]::-ms-fill-upper {
+    background: rgba(255, 113, 169, 0.78);
+    border: 3.2px solid #00010f;
+    border-radius: 50px;
+  }
+  input[type=range]::-ms-thumb {
+    width: 25px;
+    height: 25px;
+    background: #372440;
+    border: 3.2px solid rgba(255, 184, 255, 0.6);
+    border-radius: 50px;
+    cursor: pointer;
+    margin-top: 0px;
+    /*Needed to keep the Edge thumb centred*/
+  }
+  input[type=range]:focus::-ms-fill-lower {
+    background: rgba(255, 113, 169, 0.78);
+  }
+  input[type=range]:focus::-ms-fill-upper {
+    background: #ffffff;
+  }
+  /*TODO: Use one of the selectors from https://stackoverflow.com/a/20541859/7077589 and figure out
+  how to remove the virtical space around the range input in IE*/
+  @supports (-ms-ime-align:auto) {
+    /* Pre-Chromium Edge only styles, selector taken from hhttps://stackoverflow.com/a/32202953/7077589 */
+    input[type=range] {
+      margin: 0;
+      /*Edge starts the margin from the thumb, not the track as other browsers do*/
+    }
+  }
+  
+.cvs {
+  border: 1px solid rgb(133, 50, 128);
+  background-color: black !important;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+.form-label {
+  color: #e83e8c;
+}
+
+/* .tooltip {
+  pointer-events: none;
+  
+}
+ */

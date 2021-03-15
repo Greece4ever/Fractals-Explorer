@@ -19,6 +19,8 @@ function reset() {
 }
 
 function attachListeners() {
+
+    // NOTE -> BUG: window.ondevicemotion works only when the page is served via HTTPS
     window.addEventListener("devicemotion", (e) => {
         if (!useAcceleromenter)
             return;

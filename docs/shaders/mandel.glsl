@@ -21,9 +21,6 @@ vec2 toCartesian(in vec2 pixel_pos) {
     );
 }
 
-// sin(-x) = -sin(x), where x > 0
-// cos(-x) = cos(x),  where x > 0
-
 vec2 setRotation(vec2 pos) {
     float SIN_ = sin(ROTATION);
     float COS_ = cos(ROTATION);
@@ -31,9 +28,6 @@ vec2 setRotation(vec2 pos) {
     float x = pos.x * COS_ - pos.y * SIN_;
     float y = pos.x * SIN_ + pos.y * COS_;
     return vec2(x, y);
-
-    // float len = sqrt( (pos.x * pos.x) + (pos.y * pos.y) ); // sqrt(x^2 + y^2)
-    // return vec2(sin(angle) * leng)
 }
 
 struct Complex {

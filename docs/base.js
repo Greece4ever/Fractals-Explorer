@@ -1,3 +1,30 @@
+const vShader = ` 
+#version 300 es
+
+in vec2 pos;
+
+void main() {
+    gl_Position = vec4(pos, 0.0, 1.0);
+}
+`.trim();
+
+
+function finishLoading() {
+    canvas.parentElement.style.removeProperty("position");
+    canvas.parentElement.className = "none";
+    let spinner = document.getElementById("spinner");
+    spinner.remove();
+}
+
+function finishLoadingButNoError() {
+    // canvas.parentElement.style.removeProperty("position");
+    // canvas.parentElement.className = "none";
+    let spinner = document.getElementById("spinner");
+    spinner.remove();
+}
+
+
+
 let err_div_log = document.getElementById("ERROR_COMPILATION");
 
 function disableError() {
@@ -6,9 +33,14 @@ function disableError() {
 }
 
 function setError(str) {
+    try { gl.clear(gl.COLOR_BUFFER_BIT);}
+    catch(e) {};    
+    ERR_ICON.style.removeProperty("display");
+
     err_div_log.style.visibility = "visible";
-    err_div_log.style.position = "relative";
+    err_div_log.style.position   = "relative";
     err_div_log.children[0].innerHTML = str;
+    finishLoadingButNoError();
 }
 
 disableError();
@@ -22,11 +54,16 @@ disableError();
     }
 
     let consoleError = (header, str_err) => {
+        
         err_div.innerHTML += `<pre> <code style="color: rgb(233, 74, 147)">${header}</b><hr> <div style="color: white">${style(str_err)}</div></pre>`
     }
 
-    let console_ = (str) => {
-        webgl_console.innerHTML += `<span style="color: white">${style(str)}</span>\n`
+    let console_ = (str, elm=null) => {
+        if (elm === null) {
+            webgl_console.innerHTML += `<span style="color: white">${style(str)}</span>\n`;
+        } else {
+            elm.innerHTML += `<span style="color: white">${style(str)}</span>\n`;
+        }
     }
 
     const getHardWareInfo = () => {
@@ -70,6 +107,8 @@ disableError();
     }
 // END DEBUG.JS
 
+var shaderDIV;
+
 // BEGIN LOAD.JS
     const canvas = document.getElementById("canvas");
     canvas.width = window.innerWidth - 30;
@@ -80,12 +119,12 @@ disableError();
 
     if (!gl) {
         consoleError("Initialising Context...", `ERROR: Webgl2 Not supported by Browser`);
-        setError("WebGL2 not supported by browser, cannot continue.");
+        setError("It looks like your browser does not support <b style='color: black'>WebGL2</b> and thus this page cannot work . You can find more information <a rel='noreferrer noopener' href='https://get.webgl.org/webgl2/'>here</a>");
     }
     else 
         consoleError("Initialising Context...", `SUCCESS: Initialised Webgl2 Context`)
 
-    consoleError("Loading Shaders...", "");
+    shaderDIV = consoleError("Loading Shaders...", "");
     err_div.innerHTML += "<pre id=\"console0\"></pre>";
     webgl_console = document.getElementById("console0");
 // END LOAD.JS
@@ -137,6 +176,9 @@ disableError();
             let str2 =  compilationLog;
             consoleError(str1, str2);
             setError(`Failed to compile shader <b style="color : #fff">${types[type]}</b>. Additional information can be found in the console output below.`);
+            console.log("Failed to Compile Fragment Shader (As can be seen in the HTML <body>)");
+            console.log(str2);
+            console.log(source_str);
             return false;
         }
         return shader;
@@ -159,156 +201,47 @@ disableError();
 
         if ( !gl.getProgramParameter( program, gl.LINK_STATUS) ) {
             var info = gl.getProgramInfoLog(program);
-            consoleError('Could not compile WebGL program. ', info);
+            console_('[ERROR] Could not compile WebGL program. ');
+            console_(`[ERROR] ${info}`);
             setError("Failed to link/compile WebGL shader program, check the logs below.");
         }
         return program;
     }
 // END GL_WRAPPER.JS
 
-const vShader = `
-#version 300 es
+function loadShader(URL, callback, type="Shader") {
+    let a = new XMLHttpRequest();
+    let ID = Math.random();
+    let ELM = `[INFO] Loading ${type} from <b style="color: green">"${URL}"</b> <b id="${ID}">0%</b>`
+    console_(ELM);
+    let ELEMENT = document.getElementById(ID.toString());
 
-in vec2 pos;
+    a.addEventListener("progress", (e) => {
+        let percentage = "?";
+        if (e.lengthComputable) {
+            percentage = e.loaded / e.total * 100;
+        }
+        ELEMENT.innerText = `${percentage}%`;
+    })
 
-void main() {
-    gl_Position = vec4(pos, 0.0, 1.0);
+    a.addEventListener("load", (e) => {
+        let shader_response = a.response;
+        return callback(shader_response);
+    })
+    
+    a.addEventListener("error", (e) => {
+        setError(`Failed to fetch shader at "${URL}".`);
+    })
+
+    a.open("GET", URL);
+    a.send();
 }
-`.trim();
-
-var fShader = `
-#version 300 es
-precision highp float;
-
-uniform vec2  u_resolution;
-uniform vec2  offset; 
-uniform float zoom;
-uniform float ROTATION;
-uniform int   C_ALOGRITHM;
-
-#define width  u_resolution.x
-#define height u_resolution.y
-#define MATH_PI 3.1415926538
-
-vec2 toCartesian(in vec2 pixel_pos) {
-    float centerX = (width  / 2.0)  - offset.x;
-    float centerY = (height / 2.0)  + offset.y;
-
-    return vec2(
-         (pixel_pos.x - centerX) / zoom, 
-        -(pixel_pos.y - centerY) / zoom  
-    );
-}
-
-// sin(-x) = -sin(x), where x > 0
-// cos(-x) = cos(x),  where x > 0
-
-vec2 setRotation(vec2 pos) {
-    float SIN_ = sin(ROTATION);
-    float COS_ = cos(ROTATION);
-
-    float x = pos.x * COS_ - pos.y * SIN_;
-    float y = pos.x * SIN_ + pos.y * COS_;
-    return vec2(x, y);
-
-    // float len = sqrt( (pos.x * pos.x) + (pos.y * pos.y) ); // sqrt(x^2 + y^2)
-    // return vec2(sin(angle) * leng)
-}
-
-struct Complex {
-    float real;
-    float imag;
-};
-
-out vec4 FragColor;
-
-void main() {
-    vec2 pos = setRotation( toCartesian(gl_FragCoord.xy) );
-    float x = pos.x, y = pos.y;
-
-    Complex z;
-        z.real = 0.0;
-        z.imag = 0.0;
-    Complex _z;
-        _z.real = 0.0;
-        _z.imag = 0.0;
-
-    float a_2, b_2; 
-
-    int iter = 0;
-    const int max_iter = 50;
-
-    for (int i=0; i < max_iter; i++) {
-        a_2 = _z.real * _z.real;
-        b_2 = _z.imag * _z.imag;
-
-        z.real = a_2 - b_2;
-        z.imag = 2.0 * _z.real * _z.imag;
-
-        z.real += x;
-        z.imag += y;
-
-        _z.real = z.real;
-        _z.imag = z.imag;
-
-        if ( (a_2 + b_2) > 4.0) {
-            iter = i;
-            break;
-        }
-
-
-    }
-
-    float value = float(iter) / float(max_iter);
-
-    switch (C_ALOGRITHM) {
-        case 0:
-        {
-            float smooth_ = float(iter) + 1.0 - log(abs(sqrt(a_2 + b_2))) / log(2.0);
-            FragColor = vec4( smooth_ * 0.05, value, smooth_ * value, 1);
-            break;
-        }
-        case 1:
-        {
-            float smooth_ = float(iter) + 1.0 - log(abs(sqrt(a_2 + b_2))) / log(2.0);
-            FragColor = vec4(value / smooth_, 0.0, value, 1);
-            break;
-        }
-        case 2:
-        {
-            float delta = log2(z.real) * value * exp(b_2 / a_2);
-            FragColor = vec4(delta, value, log(delta / (1.0 - delta * value)), 1.0);
-            break;
-
-        }
-        case 3:
-        {
-            float sm = pow(log(value * MATH_PI), log2(MATH_PI));
-            FragColor = vec4(value *  log2(2.718 * sm),  1.0/sm, value, 1);
-            break;
-        }
-        case 4: {
-            FragColor = vec4(0.0, value, 0.0, 1.0);
-            break;
-        }
-        case 5: {
-            float smooth_ = float(iter) + 1.0 - log(abs(sqrt(a_2 + b_2))) / log(2.0);
-            float smooth_2 = smooth_ + 1.0 - log(smooth_ * abs(sqrt(a_2 + b_2))) / log(2.0);
-            float smooth_3 = sin(z.real *  MATH_PI) * log(smooth_ / smooth_2);
-            FragColor = vec4(sin(smooth_3), sin(smooth_), cos(smooth_2), 1.0);
-            break;
-        }
-    }
-}
-`.trim();
-
-console_("[INFO] Loading Fragment Shader <b id=\"per0\">0%</b>");
-
 
 let res_div = document.getElementById("res_div");
 res_div.style.width = `${window.innerWidth - 30}px`;
 
-let resolution_loc;
+var selectedProgram;
+
 
 class Vector {
     constructor(x, y) {
@@ -327,23 +260,29 @@ function resizef() {
     mid.y = height / 2.0;
 
     canvas.width  = width;
+    if (height > window.innerHeight)
+        height = window.innerHeight - 20;
+
     canvas.height = height;
 
-    if (resolution_loc != undefined) {
-        gl.uniform2f(resolution_loc, width, height);
+    if (selectedProgram != undefined) {
+        gl.uniform2f(selectedProgram.resolution_loc, width, height);
         gl.viewport(0, 0, width, height);
     }
 }
 
 function resizeCanvas(width, height) {
     mid.x = width  / 2.0;
+    if (height > window.innerHeight)
+        height = window.innerHeight;
+
     mid.y = height / 2.0;
 
     canvas.width  = width;
     canvas.height = height;
 
-    if (resolution_loc != undefined) {
-        gl.uniform2f(resolution_loc, width, height);
+    if (selectedProgram != undefined) {
+        gl.uniform2f(selectedProgram.resolution_loc, width, height);
         gl.viewport(0, 0, width, height);
     }
 
@@ -360,4 +299,58 @@ window.addEventListener("resize", () => {
     resizef();
 })
 
-init();
+var fShader;
+
+let shader_paths = [
+    'mandel',
+    'julia',
+
+    'newton',
+    'newton',
+
+]
+window.addEventListener("error", (e) => {
+    finishLoadingButNoError();
+    setError("Something went wrong, check the JavaScript Console.<br>" + "What went wrong: <b>" + e.error + "</b>");
+})
+
+let shaders = [];
+let config = [];
+let programs = [];
+let active_preview;
+
+var CURRENT_CONFIG;
+
+let SID = 0;
+function load_shaders() {
+    let name = shader_paths[SID];
+    let SHADER_URL = `./shaders/${name}.glsl`;
+    let JS_URL = `./components/${name}.js`
+
+    loadShader(SHADER_URL, (shader_resp) => {
+        shaders.push(shader_resp);
+        loadShader(JS_URL, (resp) => {
+            let script = document.createElement("script");
+            script.async = true;
+
+            window.onScriptExecute = function() {
+                config.push(CURRENT_CONFIG);
+                if (SID !== shader_paths.length - 1) {
+                    SID++;
+                    return load_shaders();
+                } else {
+                    init();
+                }
+            }
+            script.addEventListener("error", () => {
+                setError(`Execution of JavaScript file ${JS_URL} failed.`);
+            })
+
+            script.appendChild(document.createTextNode(resp + `\nwindow.onScriptExecute()`));
+            document.body.appendChild(script);
+        }, "JS File")
+
+    })
+}
+
+load_shaders();

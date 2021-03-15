@@ -3,58 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=0.5, minimum-scale=0.5, maximum-scale=0.5">
+    <link href="./style.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism.css " rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-dark.css" rel="stylesheet">
-    <style>
-      hr {
-        border: 1px solid rgb(17, 6, 114) !important;
-        border-radius: 5px !important;
-      }
+<script>
+  window.onScriptExecute = function() {};
+</script>
 
-      @keyframes colors {
-        25% { border-top-color: rgb(134, 15, 15); }
-        50% { border-right-color: rgb(134, 15, 15); }
-        75% { border-bottom-color: rgb(134, 15, 15); }
-        100% { border-left-color: rgb(134, 15, 15); }
-      }
+  <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
-      .canvas {
-        border: 3px solid rgb(16, 16, 107);
-        border-radius: 10px;
-        margin: 10px;
-      }
-
-      .canvas:hover {
-        opacity: 0.5;
-        cursor: pointer;
-        animation: colors 2s infinite linear;
-      }
-
-      * {
-        scroll-behavior: smooth !important;
-      }
-
-      html {
-    overflow: scroll;
-    overflow-x: hidden;
-    } 
-
-      ::-webkit-scrollbar {
-    width: 0;  /* Remove scrollbar space */
-    background: transparent;  /* Optional: just make scrollbar invisible */
-}
-
-    </style>
-
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <script defer src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script defer src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+  <!-- Katex -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
 
     <title>Mandelbrot Explorer</title>
 </head>
 <body style="background-color: black;">
+  <script>0</script>
 
   <div style="visibility: hidden;" id="ERROR_COMPILATION">
     <div style="margin: 10px; background-color: rgb(67, 12, 17); border-color: rgb(106, 17, 26); color: rgb(223, 122, 131);" class="alert alert-danger" role="alert">
@@ -62,11 +32,13 @@
   </div>
   <noscript>
     <div style="margin: 10px; background-color: rgb(67, 12, 17); border-color: rgb(106, 17, 26); color: rgb(223, 122, 131);" class="alert alert-danger" role="alert">
-      It seems like your browser does cannot execute JavaScript or it's been disabled.
-      This page cannot function without JavaScript, you'll have to enable it.
+      It seems like your browser cannot execute JavaScript or it's been disabled.
+      This page does not work without JavaScript, you'll have to enable it.
     </div>  
   
   </noscript>
+
+  <!-- Coordinate Text -->
   <div style="
   width: 100px; height: 40px;
   position: absolute;
@@ -78,13 +50,14 @@
    font-family: 'Courier New', Courier, monospace;
    font-size: 20px;
    border-bottom-right-radius: 10px;">
-  <div style="margin-top: 3px;">
-    <code id="zoom" style=" color: white;margin-top: 50px;">
-      0.000+0
-    </code>
+    <div style="margin-top: 3px;">
+      <code id="zoom" style=" color: white;margin-top: 50px;">
+        0.000+0
+      </code>
+    </div>
+  </div>
 
-  </div>
-  </div>
+
 
 <!-- Modal -->
 <div  class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
@@ -107,7 +80,7 @@
               <kbd>←/→</kbd>
             </div>
             <div class="col-sm">
-              <kbd>ZX</kbd>
+              <kbd>Shift/X</kbd>
             </div>
             <div class="col-sm">
               <kbd>(QK)E</kbd>
@@ -143,21 +116,68 @@
   </div>
 </div>
 
-
     <div style="user-select: none; pointer-events: none;font-family: 'Courier New', Courier, monospace; font-size: 25px; position: absolute; margin-left: 10px; margin-top: 10px; color: white;" id="fps_counter">FPS: 0</div>
 
     <div style="user-select: none; pointer-events: none;font-family: 'Courier New', Courier, monospace; font-size: 25px; position: absolute; right: 50px; margin-top: 10px; color: white;" id="pos_counter">(0, 0)</div>
 
 
-    <div id="res_div" style="overflow: auto; position: absolute;width: 800px; height: 600px; resize: horizontal; background-color: transparent"></div>
 
-    
-    <canvas width="800" height="600" id="canvas">
-      <div style="margin: 10px; background-color: rgb(67, 12, 17); border-color: rgb(106, 17, 26); color: rgb(223, 122, 131);" class="alert alert-danger" role="alert">
-        It seems like your browser does not support the HTML canvas element.
-        You can find the list of supported browsers <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#browser_compatibility">here</a>.
-      </div>  
-    </canvas>
+
+    <div id="res_div" style="overflow: auto; position: absolute;width: 800px; height: 600px; resize: horizontal; background-color: transparent">
+    </div>
+
+
+    <div class="d-flex justify-content-center" style="position: relative;">
+      <div id="spinner" 
+      style="position: absolute;
+      top: 40%;
+      justify-content: center;
+      width: 150px; height: 150px;
+      " class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+      <div style="
+      position: absolute;
+      color: #d76363;
+      display: none;
+      top: 40%;
+      justify-content: center;
+      
+      " id="ERROR_SYMBOL">
+        <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+          <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+        </svg>
+      </div>
+
+
+      <canvas width="800" height="600" id="canvas">
+        <div style="margin: 10px; background-color: rgb(67, 12, 17); border-color: rgb(106, 17, 26); color: rgb(223, 122, 131);" class="alert alert-danger" role="alert">
+          It seems like your browser does not support the HTML canvas element.
+          You can find the list of supported browsers <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#browser_compatibility">here</a>.
+        </div>  
+      </canvas>  
+    </div>
+
+    <div class="d-flex" id="mobile">
+        <button id="Accelerometer" state="0" data-html="true"
+         data-toggle="tooltip" data-placement="bottom" title="Enable Accelerometer"
+         class="btn" style="width: 50%; color: #0275e8; background-color: transparent !important;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-speedometer2" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4zM3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.389.389 0 0 0-.029-.518z"/>
+            <path fill-rule="evenodd" d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A7.988 7.988 0 0 1 0 10zm8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3z"/>
+          </svg>
+        </button>
+
+        <button id="resetButton"
+        data-toggle="tooltip" data-html="true" data-placement="bottom" title="<b style='color: #0275e8;'>Reset Position<b>"
+        style="width: 50%; color: #0275e8; background-color: transparent !important; border: 0; outline-color: #0275e8;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+            <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+          </svg>
+        </button>
+    </div>
+
 
     <ul style="margin-top: 50px; margin-left: 20px;" class="nav nav-pills nav-fill">
         <li class="nav-item">
@@ -175,29 +195,44 @@
       </ul>
 
   
-    
-    <div style="margin-top: 50px;"></div>
+  
+    <div style="margin: 50px;"></div>
+
+    <code style="margin-left: 20px; font-weight: 500;">Coloring Algorithms</code>
     <hr>
+
+    <div id="PROGRAM_PREVIEW">
+
+    </div>
+
+    
+    
+
+    <code style="margin-left: 20px; font-weight: 500;">Fractals</code>
+    <hr>
+
+    <!-- Fractal list -->
+    <div class="row d-flex justify-content-start" id="fractalList">
+
+    </div>
+    <hr>
+    <select ID="SELECT" style="margin-left: 10px; margin-bottom: 40px;width: 200px; background-color: rgb(24, 26, 27);border-color: rgb(60, 65, 68);color: rgb(233, 74, 147);" class="custom-select">
+    </select>
+
 
     <div style="background-color: rgb(0, 0, 0); border: 10px hidden green; padding: 10px;" id="errors"></div>
     <div  style="color: white !important; margin-left: 50px;" id="code"></div>
     <div  style="color: white !important; margin-left: 50px;" id="codeVertex"></div>
     
-    <code style="margin-left: 20px; font-weight: 500;">Coloring Algorithms</code>
-    <hr>
-    <div style="margin-top: 50px;" class="row" id="preview">
+    <br>
 
-    </div>
-
-    <!-- <canvas width="200px" height="128px" id="sets">
-
-    </canvas> -->
-    
 </body>
 </html>
 <script>
     let links = Array.from( document.getElementsByClassName("nav-link") );
+    let SELECT_DIV = document.getElementById("SELECT");
     links = links.slice(0, links.length-1);
+    let ERR_ICON = document.getElementById("ERROR_SYMBOL");
 
     links.forEach(link => {
         link.addEventListener("click", () => {
@@ -209,6 +244,9 @@
                 item.hidden = true;
                 item.style.visibility = "hidden";
                 item.style.position = "absolute";
+
+                SELECT_DIV.style.visibility = "hidden";
+                SELECT_DIV.style.position = "absolute";
             });
             let item = document.getElementById(link.getAttribute("for"));
             // item.setAttribute("hidden", true);
@@ -217,6 +255,11 @@
             item.hidden = false;
             item.style.visibility = "visible";
             item.style.position = "relative";
+
+            if (links.indexOf(link) == 1) {
+              SELECT_DIV.style.position = "relative";
+              SELECT_DIV.style.visibility = "visible";
+            }
         })
 
         links[0].click();
@@ -231,6 +274,8 @@
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-c.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-glsl.js" defer></script>
 
+<script src="./replace.js" defer></script>
 <script src="./gl.js" defer></script>
 <script src="./base.js" defer></script>
+
 
