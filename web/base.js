@@ -33,12 +33,14 @@ function disableError() {
 }
 
 function setError(str) {
-    gl.clear(gl.COLOR_BUFFER_BIT)
+    try { gl.clear(gl.COLOR_BUFFER_BIT);}
+    catch(e) {};    
     ERR_ICON.style.removeProperty("display");
 
     err_div_log.style.visibility = "visible";
     err_div_log.style.position   = "relative";
     err_div_log.children[0].innerHTML = str;
+    finishLoadingButNoError();
 }
 
 disableError();
@@ -117,7 +119,7 @@ var shaderDIV;
 
     if (!gl) {
         consoleError("Initialising Context...", `ERROR: Webgl2 Not supported by Browser`);
-        setError("WebGL2 not supported by browser, cannot continue.");
+        setError("It looks like your browser does not support <b style='color: black'>WebGL2</b> and thus this page cannot work . You can find more information <a rel='noreferrer noopener' href='https://get.webgl.org/webgl2/'>here</a>");
     }
     else 
         consoleError("Initialising Context...", `SUCCESS: Initialised Webgl2 Context`)
@@ -275,8 +277,6 @@ function resizeCanvas(width, height) {
         height = window.innerHeight;
 
     mid.y = height / 2.0;
-
-
 
     canvas.width  = width;
     canvas.height = height;

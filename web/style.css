@@ -207,7 +207,8 @@ background: transparent;  /* Optional: just make scrollbar invisible */
   color: #e83e8c;
 }
 
-/* .btn:focus {
-  outline: none !important;
-  box-shadow: none !important;
-} */
+/* .tooltip {
+  pointer-events: none;
+  
+}
+ */

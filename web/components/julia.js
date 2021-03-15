@@ -1,5 +1,3 @@
-// julia_exports
-
 let julia_exports = {
   "function" : null,
   "html" : null, 

@@ -7,21 +7,64 @@ function glCall(line) {
     console_(`[${status}] OpenGL ${error} (${errors[error]}) at line <b style="color: blue">${line}</b>`);
 }
 
+let useAcceleromenter = false;
+
+function reset() {
+    offset.zoom = 100.0;
+    offset.zoomVelocity = 100.0;
+    offset.velocity = 500.0;
+    offset.x = 0.0;
+    offset.y = 0.0;
+    offset.rot = 0.0;
+}
 
 function attachListeners() {
-
-    console.log(window.DeviceMotionEvent);
-
     window.addEventListener("devicemotion", (e) => {
+        if (!useAcceleromenter)
+            return;
+
         let x = e.accelerationIncludingGravity.x;
         let y = e.accelerationIncludingGravity.y;
-        console.log(x);
-        let delta = offset.prevAX - x;
-        // offset.prevAX = x;
-        offset.x -= x * 100.0 *  timer.getElapsedTime();
+
+        let deltaY = 25.0;
+        let DX = x * 25.0 *  timer.getElapsedTime();
+        let DY;
+
+            
+        if (y > 0) 
+            DY = y * (deltaY / 2) * timer.getElapsedTime();
+        else
+            DY = y * deltaY * timer.getElapsedTime();            
+
+        offset.x -= DX;
+        offset.y += DY;
+
     })
 
+    resetButton.addEventListener("click", () => {
+        reset();
+    })
 
+    accelerometer.addEventListener("click", (e) => {
+
+        if (e.currentTarget.getAttribute("state") === "1") {
+            e.currentTarget.setAttribute("state", "0");
+            let value = "Accelerometer <b style='color: #d76363'>OFF</b>";
+            e.currentTarget.setAttribute("title", value);
+            e.currentTarget.setAttribute("data-original-title", value);
+            useAcceleromenter = false;
+        }
+        else {
+            let value = "Accelerometer <b style='color: rgb(72, 250, 105)'>ON</b>";
+            e.currentTarget.setAttribute("state", "1");
+            e.currentTarget.setAttribute("title", value);
+            e.currentTarget.setAttribute("data-original-title", value);
+            useAcceleromenter = true;
+        }
+
+        $(e.currentTarget).tooltip("update");
+        $(e.currentTarget).tooltip("show");
+    })
 
     window.addEventListener("keydown", (e) => {
         held_keys[e.key.toLowerCase()] = true;
@@ -30,12 +73,7 @@ function attachListeners() {
     window.addEventListener("keypress", (e) => {
         switch (e.key.toLowerCase()) {
             case "enter":
-                offset.zoom = 100.0;
-                offset.zoomVelocity = 100.0;
-                offset.velocity = 500.0;
-                offset.x = 0.0;
-                offset.y = 0.0;
-                offset.rot = 0.0;
+                reset();
                 break;
         }
     })
@@ -44,6 +82,7 @@ function attachListeners() {
     window.addEventListener("keyup", (e) => {
         held_keys[e.key.toLowerCase()] = false;
     })
+
 
     res_div.addEventListener("mousemove", (e) => {
         let delta = e.target.getBoundingClientRect();
@@ -61,7 +100,6 @@ function attachListeners() {
             let dx = offset.prevX - diff;
             if (timer)
                 offset.zoomVelocity -= 500 * dx * timer.getElapsedTime();
-            console.log(offset.zoomVelocity);
             offset.prevX = diff;    
         }
         
@@ -117,7 +155,11 @@ function attachListeners() {
         }
     })
 
-    res_div.addEventListener("click", () => {
+    res_div.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+
+        resizeCanvas(screen.width, screen.height);
+
         res_div.style.resize = "none";
         resizeCanvas(screen.width, screen.height);
         document.body.requestFullscreen();
@@ -413,6 +455,8 @@ function initFractals() {
             // Tooltip
                 elm.setAttribute("data-toggle", "tooltip");
                 elm.setAttribute("data-html", "true");
+                // elm.setAttribute("data-placement", "bottom")
+                // $(elm).tooltip({container: 'body'});
 
             
             let full_text = `<b style="color: #60adff">${config[i]["title"]}</b><br>${replaceMath(config[i]["description"])}`

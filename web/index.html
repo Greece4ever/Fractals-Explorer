@@ -58,6 +58,7 @@
   </div>
 
 
+
 <!-- Modal -->
 <div  class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
   <div style="background-color: rgb(24, 26, 27) !important; color: white; border-color: brown;" class="modal-dialog" role="document">
@@ -79,7 +80,7 @@
               <kbd>←/→</kbd>
             </div>
             <div class="col-sm">
-              <kbd>ZX</kbd>
+              <kbd>Shift/X</kbd>
             </div>
             <div class="col-sm">
               <kbd>(QK)E</kbd>
@@ -126,7 +127,6 @@
     </div>
 
 
-
     <div class="d-flex justify-content-center" style="position: relative;">
       <div id="spinner" 
       style="position: absolute;
@@ -158,7 +158,27 @@
       </canvas>  
     </div>
 
-    
+    <div class="d-flex" id="mobile">
+        <button id="Accelerometer" state="0" data-html="true"
+         data-toggle="tooltip" data-placement="bottom" title="Enable Accelerometer"
+         class="btn" style="width: 50%; color: #0275e8; background-color: transparent !important;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-speedometer2" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4zM3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.389.389 0 0 0-.029-.518z"/>
+            <path fill-rule="evenodd" d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A7.988 7.988 0 0 1 0 10zm8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3z"/>
+          </svg>
+        </button>
+
+        <button id="resetButton"
+        data-toggle="tooltip" data-html="true" data-placement="bottom" title="<b style='color: #0275e8;'>Reset Position<b>"
+        style="width: 50%; color: #0275e8; background-color: transparent !important; border: 0; outline-color: #0275e8;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+            <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+          </svg>
+        </button>
+    </div>
+
+
     <ul style="margin-top: 50px; margin-left: 20px;" class="nav nav-pills nav-fill">
         <li class="nav-item">
           <a for="errors" class="nav-link active" aria-current="page" href="#">Console Output</a>
@@ -186,18 +206,18 @@
     </div>
 
     
-    <select ID="SELECT" style="margin-left: 10px;width: 200px; background-color: rgb(24, 26, 27);border-color: rgb(60, 65, 68);color: rgb(233, 74, 147);" class="custom-select">
-    </select>
     
 
     <code style="margin-left: 20px; font-weight: 500;">Fractals</code>
     <hr>
 
     <!-- Fractal list -->
-    <div class="scrollX d-flex justify-content-start" id="fractalList">
+    <div class="row d-flex justify-content-start" id="fractalList">
 
     </div>
     <hr>
+    <select ID="SELECT" style="margin-left: 10px; margin-bottom: 40px;width: 200px; background-color: rgb(24, 26, 27);border-color: rgb(60, 65, 68);color: rgb(233, 74, 147);" class="custom-select">
+    </select>
 
 
     <div style="background-color: rgb(0, 0, 0); border: 10px hidden green; padding: 10px;" id="errors"></div>
