@@ -7,34 +7,28 @@ function glCall(line) {
     console_(`[${status}] OpenGL ${error} (${errors[error]}) at line <b style="color: blue">${line}</b>`);
 }
 
+
 function attachListeners() {
+
+    console.log(window.DeviceMotionEvent);
+
+    window.addEventListener("devicemotion", (e) => {
+        let x = e.accelerationIncludingGravity.x;
+        let y = e.accelerationIncludingGravity.y;
+        console.log(x);
+        let delta = offset.prevAX - x;
+        // offset.prevAX = x;
+        offset.x -= x * 100.0 *  timer.getElapsedTime();
+    })
+
+
+
     window.addEventListener("keydown", (e) => {
         held_keys[e.key.toLowerCase()] = true;
     })
 
     window.addEventListener("keypress", (e) => {
         switch (e.key.toLowerCase()) {
-            case "1":
-                gl.uniform1i(C_ALOGRITHM, 0);
-                break;
-            case "2":
-                gl.uniform1i(C_ALOGRITHM, 1);
-
-                break;
-            case "3":
-                gl.uniform1i(C_ALOGRITHM, 2);
-
-                break;
-            case "4":
-                gl.uniform1i(C_ALOGRITHM, 3);
-
-                break;
-            case "5":
-                gl.uniform1i(C_ALOGRITHM, 4);
-                break;    
-            case "6":
-                gl.uniform1i(C_ALOGRITHM, 5);
-                break;        
             case "enter":
                 offset.zoom = 100.0;
                 offset.zoomVelocity = 100.0;
@@ -55,7 +49,60 @@ function attachListeners() {
         let delta = e.target.getBoundingClientRect();
         mpos.x = e.clientX - delta.x;
         mpos.y = e.clientY - delta.y;
+        
     })
+
+    res_div.addEventListener("touchmove", (e) => {
+        let delta = e.target.getBoundingClientRect();
+        let touches = e.touches[0];
+        
+        if (e.touches.length > 1) {
+            let diff = e.touches[1].clientX - delta.x;
+            let dx = offset.prevX - diff;
+            if (timer)
+                offset.zoomVelocity -= 500 * dx * timer.getElapsedTime();
+            console.log(offset.zoomVelocity);
+            offset.prevX = diff;    
+        }
+        
+
+        mpos.x = touches.clientX - delta.x;
+        mpos.y = touches.clientY - delta.y;
+        
+    })
+
+    res_div.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        held_keys["shift"] = true;
+
+        let delta = e.target.getBoundingClientRect();
+        let touches = e.touches[0];
+
+        if (e.touches.length > 1) {
+            held_keys["q"] = true;
+        }
+        
+        mpos.x = touches.clientX - delta.x;
+        mpos.y = touches.clientY - delta.y;
+
+    })
+
+    res_div.addEventListener("touchend", (e) => {
+        if (e.changedTouches.length === 1) {
+            if (e.changedTouches[0].identifier === 1) {
+                held_keys["q"] = false;    
+            }
+            else {
+                held_keys["shift"] = false;
+            }
+        }
+        else {
+            held_keys["shift"] = false;
+            held_keys["q"] = false;    
+        }
+    })
+
+
 
     document.addEventListener('fullscreenchange', (e) => {
         if (document.mozFullScreen !== undefined) {
@@ -116,7 +163,8 @@ class Timer {
 let offset = {
     "rot" : 0.0, "x" : 0, "y" : 0,
     "zoom": 100.0, "velocity" : 500.0, 
-    "zoomVelocity" : 100.0, "runVelocity" : 200.0
+    "zoomVelocity" : 100.0, "runVelocity" : 200.0,
+    "prevX" : 0, "prevAX" : 0
 };
 
 const toCartesian = (pX, pY) => {
@@ -177,6 +225,8 @@ function OrbitControl(timer) {
             offset.zoom += zoomVelocity * timer.getElapsedTime();
         if (x_pressed)
             offset.zoom -= zoomVelocity * timer.getElapsedTime();
+
+        // offset.zoomVelocity += 50.0 * timer.getElapsedTime();
 
         if (offset.zoom < 1) {
             offset.zoom = 2;
@@ -276,6 +326,8 @@ function initSyntax() {
     document.getElementById("codeVertex").innerHTML = `<pre style="color:white !important">` + html2 + "</pre>";
 }
 
+let CURRENT_SHADER;
+var TEST_IMAGE;
 
 function initFractals() {
     let fractalList = document.getElementById("fractalList");
@@ -283,6 +335,11 @@ function initFractals() {
 
     let first;
     for (let i=0; i < shaders.length; i++) {
+        if (config[i]["edit_shader"]) {
+            CURRENT_SHADER = i;
+            config[i]["edit_shader"](...config[i]["edit_args"]);
+        }
+
         let program = new ProgramGL(shaders[i]);
             program.bind();
 
@@ -294,10 +351,8 @@ function initFractals() {
 
         let func = config[i]["function"];
         let html = config[i]["html"];
-        // let desc = 
         let wasNull = false;
-        
-
+    
 
         let ELEMENT = document.createElement("div");
 
@@ -377,9 +432,8 @@ function initFractals() {
             });
     
             fractalList.appendChild(a_link);
-
+            
             let ctx = elm.getContext("2d");
-    
             ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 
                                   0, 0, elm.width, elm.height);    
     }
@@ -461,6 +515,9 @@ function glInit() {
 }
 
 function init() {
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.BLEND);
+
     printInfo();
         consoleError("WEBGL", "");
         err_div.innerHTML += "<pre id=\"console\"></pre>"

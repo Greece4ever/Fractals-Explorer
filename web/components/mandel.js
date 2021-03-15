@@ -1,6 +1,5 @@
 // mandel_exports
 let mandel_exports = {
-    "name" : "Mandelbrot", 
     "uniforms": ["C_ALOGRITHM"],
     "function": null,
     "html" : null
@@ -17,6 +16,7 @@ mandel_exports["function"] = function(program) {
     
     program.bind();
     program.updateCommonUniforms();
+
 
     for (let i=0; i < 6; i++) {
         // gl.uniform1i(selectedProgram.C_ALOGRITHM, i);

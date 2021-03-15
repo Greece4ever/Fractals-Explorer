@@ -202,3 +202,12 @@ background: transparent;  /* Optional: just make scrollbar invisible */
   margin-top: 10px;
   margin-left: 10px;
 }
+
+.form-label {
+  color: #e83e8c;
+}
+
+/* .btn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+} */

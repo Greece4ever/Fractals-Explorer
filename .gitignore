@@ -2,4 +2,6 @@
 *.sh
 .vscode/
 *.ttf
-
+*.o
+*.key
+*.crt

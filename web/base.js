@@ -8,6 +8,7 @@ void main() {
 }
 `.trim();
 
+
 function finishLoading() {
     canvas.parentElement.style.removeProperty("position");
     canvas.parentElement.className = "none";
@@ -173,6 +174,9 @@ var shaderDIV;
             let str2 =  compilationLog;
             consoleError(str1, str2);
             setError(`Failed to compile shader <b style="color : #fff">${types[type]}</b>. Additional information can be found in the console output below.`);
+            console.log("Failed to Compile Fragment Shader (As can be seen in the HTML <body>)");
+            console.log(str2);
+            console.log(source_str);
             return false;
         }
         return shader;
@@ -254,6 +258,9 @@ function resizef() {
     mid.y = height / 2.0;
 
     canvas.width  = width;
+    if (height > window.innerHeight)
+        height = window.innerHeight - 20;
+
     canvas.height = height;
 
     if (selectedProgram != undefined) {
@@ -264,8 +271,13 @@ function resizef() {
 
 function resizeCanvas(width, height) {
     mid.x = width  / 2.0;
+    if (height > window.innerHeight)
+        height = window.innerHeight;
+
     mid.y = height / 2.0;
-    
+
+
+
     canvas.width  = width;
     canvas.height = height;
 
@@ -292,6 +304,10 @@ var fShader;
 let shader_paths = [
     'mandel',
     'julia',
+
+    'newton',
+    'newton',
+
 ]
 window.addEventListener("error", (e) => {
     finishLoadingButNoError();
@@ -314,7 +330,7 @@ function load_shaders() {
     loadShader(SHADER_URL, (shader_resp) => {
         shaders.push(shader_resp);
         loadShader(JS_URL, (resp) => {
-            let script = document.createElement("script");            script.onparse
+            let script = document.createElement("script");
             script.async = true;
 
             window.onScriptExecute = function() {
