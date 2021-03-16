@@ -120,7 +120,8 @@ void rplc(std::string& str, std::string word, std::string rplcmt) {
 
 
 std::string loadKernelSource(std::string source_code, std::string width, std::string height, int cord_array[]) {
-	if (width.length() > 5 || height.length() > 5)
+	std::cout << "BEGIN\n";
+    if (width.length() > 5 || height.length() > 5)
 	{
 		printf("Input width and/or height too large to be proccesed.\n");
 		exit(1);
@@ -135,7 +136,6 @@ std::string loadKernelSource(std::string source_code, std::string width, std::st
 
 	cord_array[0] = __width;
 	cord_array[1] = __height;
-    delete[] cord_array;
 
 	return source_code;
 }
@@ -187,19 +187,21 @@ cl::Device get_device(int platform_index=0, int device_index=0) {
 
 
 int main() {
+    fprintf(stdout, "[ Warning ] Running this may require `sudo` permissions.\n");
     // int width = 800, height = 600;
     dim::width  = 800;
     dim::height = 600;
 
     int SIZE = dim::width * dim::height;
     int BUFFER_SIZE = SIZE * sizeof(DTYPE);
-
+    
 
     cl::Device device = get_device(0, 0); // Defalut device 0, 0
     cl::Context context({device});
     cl::CommandQueue queue(context, device);
-    
-    std::string kernel_source = loadKernelSource(kernel_source, "800", "600", new int[2]);
+
+    int cord_array[2];
+    std::string kernel_source = loadKernelSource(KernelSource, "800", "600", cord_array);
 
     cl::Program::Sources sources; sources.push_back({kernel_source.c_str(), kernel_source.length()});
     cl::Program program(context, sources);
@@ -241,11 +243,6 @@ int main() {
     float velocity = 1.0f;
     float last_time = 0;
     sf::Clock timer;
-
-    sf::Font font;
-    font.loadFromFile("./font.ttf");
-    sf::Text text("d", font);
-        text.setPosition(10, 10);
 
 
     while (running)
@@ -313,10 +310,6 @@ int main() {
             }
 
         glEnd();
-        float currentTime = timer.getElapsedTime().asSeconds();
-        float fps = 1.0f / (currentTime);
-        text.setString(std::to_string(fps));
-        // window.draw(text);
 
         window.display();
         timer.restart();
@@ -327,7 +320,8 @@ int main() {
 /*
 function run () 
 { 
-    g++ $1 -o a.out -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network -lOpenCL -lGL && ./a.out
+    g++ $1 -o a.out -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network -lOpenCL -lGL && sudo ./a.out
 }
+
 */
 

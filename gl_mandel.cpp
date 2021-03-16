@@ -226,7 +226,7 @@ void initMap() {
     oper[sf::Keyboard::W] = [](sf::Clock clock) {world.offset.y -= world.speed.move * clock.getElapsedTime().asSeconds(); };
     oper[sf::Keyboard::S] = [](sf::Clock clock) {world.offset.y += world.speed.move * clock.getElapsedTime().asSeconds(); };
 
-    oper[sf::Keyboard::Z] = [](sf::Clock clock) {
+    oper[sf::Keyboard::LShift] = [](sf::Clock clock) {
         world.ZoomIntoPoint(cur ? world.mpos : sf::Vector2i(world.mid.x, world.mid.y), world.speed.zoom * clock.getElapsedTime().asSeconds());
     };
 
