@@ -22,54 +22,44 @@ GPU accelerated rendering of the following fractals
 
 ### Installation
 
-You **don't have to install** anything, you can just go straight to the [Mandelbrot Explorer](https://greece4ever.github.io/Mandelbrot/#) page, which is both Desktop and Mobile friendly, hosted by github pages. 
+You **don't have to install** anything, you can just go straight to the [Fractal Explorer](https://greece4ever.github.io/Fractals-Explorer/) page, which is both Desktop and Mobile friendly, hosted by github pages. 
 It is recommended to use a **Chromium** based browser for the best performance.
 
+You could also use the **native C/C++ code** which is way **faster**. 
 
-If you are facing performance issues you could use the native **C++** code which is **way** faster than any browser.
 
 ### Compiling
 
-The [**OpenGL**](https://github.com/Greece4ever/Mandelbrot/tree/master/gl) folder is available as one file [` gl_mandel.cpp`](https://github.com/Greece4ever/Mandelbrot/blob/master/gl_mandel.cpp) (which makes no disk reads like the code contained in the folder) can be compiled as such on Ubuntu/Debian based distributions 
+There are three files you can compile
 
+- [`gl_mandel.cpp`](https://github.com/Greece4ever/Fractals-Explorer/blob/master/gl_mandel.cpp) (**OpenGL** rendering of th Mandelbrot set, minified from [here](https://github.com/Greece4ever/Fractals-Explorer/tree/master/gl) )
 
-```sh
-sudo apt-get install g++
-sudo apt-get install libsfml-dev # SFML
-sudo apt-get install libglew-dev # GLEW.H
+- [`cl_mandel.cpp`](https://github.com/Greece4ever/Fractals-Explorer/blob/master/cl_mandel.cpp) (**OpenCL and OpenGL** rendering of the Mandelbrot set, minifed from [here](https://github.com/Greece4ever/Fractals-Explorer/tree/master/cl) )
 
-git clone https://github.com/Greece4ever/Mandelbrot.git && cd Mandelbrot
-g++ -std=c++17 -c gl_mandel.cpp && g++ gl_mandel.o -o gl_mandel.out -lsfml-graphics -lsfml-window -lsfml-system -lGL -lGLEW && rm gl_mandel.o 
+- [`newton_software.cpp`](https://github.com/Greece4ever/Fractals-Explorer/blob/master/newton_software.cpp) (**Software rendering** of the Newton Fractal)
 
-# Run
-./gl_mandel.out
+On `Ubuntu/Debian` to compile you can run
+
+```bash
+sudo apt-get install bash
+sudo bash install
 ```
-To build with another compiler on a custom operating system the required packages are [SFML](https://www.sfml-dev.org/) and [GLEW](http://glew.sourceforge.net/). 
+This will install all the dev-header dependencies with `apt-get` and will compile with `g++`/`clang`. This will move the three files listed above to a directory called `build/`
 
-- Output (OpenGL with glsl)
+If you want to compile and link on a different compiler and/or operating system the depndenices are 
 
-![OpenGL Demo](https://i.imgur.com/iE2eGAR.png)
+- [SFML](https://www.sfml-dev.org/download.php)
 
-Similarly the [**OpenCL**](https://github.com/Greece4ever/Mandelbrot/tree/master/cl) folder is contained in [`cl_mandel.cpp`](https://github.com/Greece4ever/Mandelbrot/blob/master/cl_mandel.cpp)
- 
-```
-sudo apt-get install g++
-sudo apt-get install libsfml-dev # SFML
+- [GLEW](http://glew.sourceforge.net/)
 
-# OpenCL
-sudo apt install ocl-icd-libopencl1
-sudo apt install opencl-headers
-
-# Compile and run (sudo is required sometimes for libOpenCL.so)
-g++ cl_mandel.cpp -o a.out -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network -lOpenCL -lGL && sudo ./a.out
-```
-
-And the output should be 
-
-![OpenCL Demo](https://i.imgur.com/LHTypBB.png)
+- [OpenCL headers](https://github.com/KhronosGroup/OpenCL-Headers)
 
 
-### Usage (OpenGL with glsl)
+
+
+### Usage 
+
+- `gl_mandel.out`
 
 ```sh
 ./gl_mandel.out --no_text # Hide FPS and zoom depth
