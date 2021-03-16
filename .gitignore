@@ -5,3 +5,6 @@
 *.o
 *.key
 *.crt
+/windows
+*.exe
+*.dll
