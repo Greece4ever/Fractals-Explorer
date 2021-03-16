@@ -13,6 +13,10 @@ function run2 {
 
 */
 
+// sys/types.h
+typedef unsigned int uint;
+typedef unsigned char u_char;
+
 #include <SFML/Graphics.hpp>
 #include <complex>
 #define WIDTH 800

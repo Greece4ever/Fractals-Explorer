@@ -61,7 +61,6 @@ GLuint compileShader(GLuint type, std::string& src)
     return s_id;
 }
 
-
 GLuint createProgram(std::string vertexShader, std::string fragmentShader)
 {
     GLuint program = glCreateProgram();
@@ -173,6 +172,7 @@ class c_map {
                 speed.move = 100.0f;
         }
 
+
     template<typename T>
     sf::Vector2f toCartesian(sf::Vector2<T> pixel_pos) {
         float centerX = mid.x - offset.x;
@@ -227,6 +227,7 @@ void initMap() {
     oper[sf::Keyboard::S] = [](sf::Clock clock) {world.offset.y += world.speed.move * clock.getElapsedTime().asSeconds(); };
 
     oper[sf::Keyboard::LShift] = [](sf::Clock clock) {
+        // std::cout << clock.getElapsedTime().asSeconds() << "\n";
         world.ZoomIntoPoint(cur ? world.mpos : sf::Vector2i(world.mid.x, world.mid.y), world.speed.zoom * clock.getElapsedTime().asSeconds());
     };
 
@@ -311,6 +312,8 @@ void main() {
     int iter = 0;
     const int max_iter = 50;
 
+
+
     for (int i=0; i < max_iter; i++) {
         a_2 = _z.real * _z.real;
         b_2 = _z.imag * _z.imag;
@@ -328,8 +331,6 @@ void main() {
             iter = i;
             break;
         }
-
-
     }
 
     float value = float(iter) / float(max_iter);
@@ -369,6 +370,12 @@ void main() {
             float smooth_2 = smooth_ + 1.0 - log(smooth_ * abs(sqrt(a_2 + b_2))) / log(2.0);
             float smooth_3 = sin(z.real *  MATH_PI) * log(smooth_ / smooth_2);
             FragColor = vec4(sin(smooth_3), sin(smooth_), cos(smooth_2), 1.0);
+            break;
+        }
+        case 6: {
+            float smooth_ = float(iter) + 1.0 - log(abs(sqrt(a_2 + b_2))) / log(2.0);
+            vec3 val = 0.5 + 0.5*cos( 3.0 +  smooth_*0.15 + vec3(0.0, 0.6, 1.0));
+            FragColor = vec4( 1.0 * sin(float(iter)) * val, 1);
             break;
         }
     }
@@ -421,6 +428,22 @@ void updateUniforms() {
     glUniform1f(rotLocation,    world.rotation); 
     glUniform1i(algLocation,    ALGO);
 }
+
+typedef unsigned int uint;
+
+/*
+
+# Windows (x86 and x86_64)
+function crun($file) {
+    $file_=python -c "print('${file}'.rsplit('.', 1)[0])" 
+    g++ -c -O3 "${file_}.cpp" -I C:\Users\progr\Downloads\glew-2.1.0-win32\glew-2.1.0\include -I C:\Users\progr\Downloads\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\include 
+    g++ "${file_}.o" -o "${file_}.exe" -L C:\Users\progr\Downloads\glew-2.1.0\glew-2.1.0\lib -L C:\Users\progr\Downloads\SFML-2.5.1-windows-gcc-7.3.0-mingw-32-bit\SFML-2.5.1\lib -lsfml-graphics -lsfml-window -lsfml-system -lglew32 -lopengl32 
+    $exec="${file_}.exe" 
+    & $exec 
+}
+
+*/
+
 
 
 void parseArgv(int argc, char* argv[]) {
@@ -501,8 +524,11 @@ int main(int argc, char* argv[]) {
     sf::Vector2u initial_pos;
     bool isFullScreen = false;
     
+
     GAME_CLOCK.restart();
     FPS_CLOCK.restart();
+
+
     while (running) {
         while (window.pollEvent(event))
         {
@@ -533,6 +559,9 @@ int main(int argc, char* argv[]) {
                         break;
                     case sf::Keyboard::Num6:
                         ALGO = 5;
+                        break;
+                    case sf::Keyboard::Num7:
+                        ALGO = 6;
                         break;
                     case sf::Keyboard::Enter: {
                         world.init(world.res.x, world.res.y);
@@ -576,7 +605,6 @@ int main(int argc, char* argv[]) {
             }
             
         }   
-        
 
         glUseProgram(program);
         glBindVertexArray(VAO); // this line is new
@@ -585,7 +613,7 @@ int main(int argc, char* argv[]) {
         glDrawArrays(GL_TRIANGLES, 0, 2 * TRIANGLE_VERTICES);
 
         world.mpos = sf::Mouse::getPosition(window);
-        orbitControl(GAME_CLOCK);
+
 
         gltSetText(ZOOM_TEXT,  to_scientic(world.zoom).c_str() );
         
@@ -606,11 +634,13 @@ int main(int argc, char* argv[]) {
             }
 
         }
-        
+
+        orbitControl(GAME_CLOCK);
 
         frames++;
+        // Note: On Windows Sf::Clock().restart() must be before window.display();
+        GAME_CLOCK.restart(); 
         window.display();
-        GAME_CLOCK.restart();
     }
     END:
         NULL;
