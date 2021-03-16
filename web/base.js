@@ -308,6 +308,9 @@ let shader_paths = [
     'newton',
     'newton',
 
+    ['julia', 'brn_ship'],
+    ['julia', 'tricorn'],
+
 ]
 window.addEventListener("error", (e) => {
     finishLoadingButNoError();
@@ -322,10 +325,19 @@ let active_preview;
 var CURRENT_CONFIG;
 
 let SID = 0;
+let __JULIA_ID = 0;
 function load_shaders() {
     let name = shader_paths[SID];
-    let SHADER_URL = `./shaders/${name}.glsl`;
-    let JS_URL = `./components/${name}.js`
+    let JS_URL;
+    let SHADER_URL;
+    
+    if (typeof name === "string") {
+        JS_URL = `./components/${name}.js`
+        SHADER_URL = `./shaders/${name}.glsl`;
+    } else {
+        JS_URL = `./components/${name[0]}.js`        
+        SHADER_URL = `./shaders/${name[1]}.glsl`;
+    }
 
     loadShader(SHADER_URL, (shader_resp) => {
         shaders.push(shader_resp);

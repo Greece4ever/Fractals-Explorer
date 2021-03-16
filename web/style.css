@@ -223,11 +223,10 @@ input[type="color"] {
 }
 
 
-/* .tooltip {
-  pointer-events: none;
-  
+.tooltip {
+  pointer-events: none;  
 }
- */
+
 
 
 
