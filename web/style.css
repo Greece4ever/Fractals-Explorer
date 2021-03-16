@@ -26,6 +26,9 @@ hr {
 
 * {
   scroll-behavior: smooth !important;
+  scrollbar-width: 10px;
+  scrollbar-color: rgb(48, 46, 46) rgb(26, 23, 27);
+  scrollbar-width: medium;  
 }
 
 .scrollX {
@@ -38,8 +41,15 @@ overflow-x: hidden;
 } 
 
 ::-webkit-scrollbar {
-width: 0;  /* Remove scrollbar space */
-background: transparent;  /* Optional: just make scrollbar invisible */
+  width: 10px;  
+  height: 10px;
+  border-radius: 200px;
+  background: rgb(26, 23, 27);  
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: rgb(48, 46, 46);
 }
 
 /* The container must be positioned relative: */
@@ -207,8 +217,17 @@ background: transparent;  /* Optional: just make scrollbar invisible */
   color: #e83e8c;
 }
 
+input[type="color"] {
+  background: rgba(0, 0, 0, 0) linear-gradient(90deg, rgb(2, 0, 36) 31%, rgb(84, 84, 122) 68%, rgba(4, 5, 5, 0.855) 74%) repeat scroll 0% 0%;
+  border: 1px double #007bff;
+}
+
+
 /* .tooltip {
   pointer-events: none;
   
 }
  */
+
+
+

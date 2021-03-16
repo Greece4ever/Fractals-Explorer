@@ -101,7 +101,7 @@ julia_exports["function"] = function(program) {
     return parent;
   }
 
-  document.querySelector(`input[type="color"]`).value = "#650688";
+  document.getElementById("julia_color").value = "#650688";
 
   let startCanvas = Complex();
   let escCanvas = EscapeRadius();
@@ -187,9 +187,8 @@ julia_exports["html"] = `
 
           <div>
               <label for="customRange1" class="form-label">Color multiplier</label>
-              <input type_="vec3" uniform="RGB"  class="slider form-control" style="
-              background: linear-gradient(90deg, rgb(2, 0, 36) 31%, rgb(84, 84, 122) 68%, rgba(4,5,5,0.8533614129245448) 74%);
-              " type="color" value="#ffffff" class="form-range" >
+              <input id="julia_color" type_="vec3" uniform="RGB"  class="slider form-control" style="
+              " type="color" value="#ffffff">
           </div>
           <div style="margin-top: 50px">
             <button val="0" id="cpos" style="width: 100%" type="button" class="btn btn-danger">Disable Custom Position</button>
