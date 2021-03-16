@@ -1,0 +1,66 @@
+function exists() {
+    if ! command -v $1 &> /dev/null
+    then
+        # failure
+        return 1
+    else
+        # success
+        return 0
+    fi
+}
+
+function cecho() {
+    printf "\n\033[91m$1\033[0m\n"
+    printf "\033[92m--------------------------------------------\033[0m\n"
+}
+
+if  exists g++;
+then
+    CPP=g++;
+    cecho "Using compiler g++"
+else
+    if exists clang++;
+    then
+        cecho "Using compiler clang++"
+        CPP=clang++
+    else
+        cecho "No Compiler found, installing g++"
+        sudo apt-get update -y
+        sudo apt-get install -y g++
+        CPP=g++
+    fi
+fi    
+
+cecho "Running apt-get update"
+sudo apt-get update  -y
+cecho "Installing SFML libraries"
+sudo apt-get install -y libsfml-dev        # SFML
+cecho "Installing Glew libraries"
+sudo apt-get install -y libglew-dev        # glew.h
+cecho "Installing OpenCL libraries"
+sudo apt-get install -y ocl-icd-opencl-dev # OpenCL
+
+cecho "Making build directory"
+mkdir build
+
+# Compile Mandelbrot (OpenGL)
+cecho "Compiling gl_mandel.out (that uses OpenGL)"
+$CPP -std=c++17 -c -O3 gl_mandel.cpp  && 
+    $CPP gl_mandel.o -o gl_mandel.out -lsfml-graphics -lsfml-window -lsfml-system -lGL -lGLEW && 
+        rm gl_mandel.o && 
+                mv gl_mandel.out build
+
+# Compile Mandelbrot (OpenCL)
+cecho "Compiling cl_mandel.out (that uses OpenCL and OpenGL)"
+$CPP -std=c++17 -c -O3 cl_mandel.cpp &&
+    $CPP cl_mandel.o -o cl_mandel.out -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network -lOpenCL -lGL  &&
+        rm cl_mandel.o && 
+                mv cl_mandel.out build/
+
+# Compile Newton (Software rendering)
+cecho "Compiling newton_software.out (that uses software rendering with SFML's OpenGL context)"
+$CPP -std=c++17 -c -O3 newton_software.cpp &&
+    $CPP newton_software.o -o software_newton.out -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network &&
+        rm newton_software.o &&
+                mv software_newton.out build/
+
