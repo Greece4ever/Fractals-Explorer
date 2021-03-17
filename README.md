@@ -10,12 +10,16 @@ GPU accelerated rendering of the following fractals
 
 - [Newton fractal](https://en.wikipedia.org/wiki/Newton_fractal)
 
+- [Tricorn](https://en.wikipedia.org/wiki/Tricorn_(mathematics))
+
+- [Burning Ship fractal](https://en.wikipedia.org/wiki/Burning_Ship_fractal)
+
  in 3 different ways 
-- [**OpenGL**](https://github.com/Greece4ever/Mandelbrot/tree/master/gl) with GLSL 
+- [**OpenGL**](https://github.com/Greece4ever/Mandelbrot/tree/master/gl) with GLSL (native C++)
 
-- [**WebGL**](https://github.com/Greece4ever/Mandelbrot/tree/master/web) with GLSL (sligthly less performant from above due to browser limitations)
+- [**WebGL**](https://github.com/Greece4ever/Mandelbrot/tree/master/web) with GLSL (using JavaScript)
 
-- [**OpenCL**](https://github.com/Greece4ever/Mandelbrot/tree/master/cl) with legacy OpenGL (Compute in OpenCL, draw in OpenGL)
+- [**OpenCL**](https://github.com/Greece4ever/Mandelbrot/tree/master/cl) with legacy OpenGL (Compute in OpenCL, draw in OpenGL, in C++)
 
 
 
@@ -25,7 +29,7 @@ GPU accelerated rendering of the following fractals
 You **don't have to install** anything, you can just go straight to the [Fractal Explorer](https://greece4ever.github.io/Fractals-Explorer/) page, which is both Desktop and Mobile friendly, hosted by github pages. 
 It is recommended to use a **Chromium** based browser for the best performance.
 
-You could also use the **native C/C++ code** which is way **faster**. 
+You could also use the **native C/C++ code** which is way **faster** by installing the available [binaries](https://github.com/Greece4ever/Fractals-Explorer/releases/tag/1.0.0) or by compiling yourself. 
 
 
 ### Compiling
@@ -41,7 +45,8 @@ There are three files you can compile
 On `Ubuntu/Debian` to compile you can run
 
 ```bash
-sudo apt-get install bash
+git clone https://github.com/Greece4ever/Fractals-Explorer.git && cd Fractals-Explorer
+sudo apt-get install bash # Probably redundant
 sudo bash install
 ```
 This will install all the dev-header dependencies with `apt-get` and will compile with `g++`/`clang`. This will move the three files listed above to a directory called `build/`
@@ -52,7 +57,7 @@ If you want to compile and link on a different compiler and/or operating system 
 
 - [GLEW](http://glew.sourceforge.net/)
 
-- [OpenCL headers](https://github.com/KhronosGroup/OpenCL-Headers)
+- [C++ OpenCL headers](https://github.com/KhronosGroup/OpenCL-CLHPP) (Only for `cl_mandel.cpp`)
 
 
 
@@ -66,3 +71,7 @@ If you want to compile and link on a different compiler and/or operating system 
 ./gl_mandel.out --no_vsync # disable VSYNC, more FPS
 ./gl_mandel.out --no_cur  # disable zoom into cursor
 ```
+Images
+----
+
+![](https://i.imgur.com/lYHgvuW.png)
