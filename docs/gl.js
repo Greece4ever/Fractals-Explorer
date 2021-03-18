@@ -236,8 +236,8 @@ var zoomVelocity;
 
 // Triggered when one key is pressed
 let KeyEvents = [
-    ["a", (timer) => offset.x -= velocity * timer.getElapsedTime(), "Move Right"],
-    ["d", (timer) => offset.x += velocity * timer.getElapsedTime(), "Move Left"],
+    ["a", (timer) => offset.x -= velocity * timer.getElapsedTime(), "Move Left"],
+    ["d", (timer) => offset.x += velocity * timer.getElapsedTime(), "Move Right"],
     ["w", (timer) => offset.y -= velocity * timer.getElapsedTime(), "Move Up"],
     ["s", (timer) => offset.y += velocity * timer.getElapsedTime(), "Move Down"],
     ["q", (     ) => offset.zoomVelocity += 500.0, "Accelerate *"],
