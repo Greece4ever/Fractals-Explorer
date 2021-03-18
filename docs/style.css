@@ -1,7 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
 
-hr {
-  border: 1px solid rgb(17, 6, 114) !important;
+.hr {
+  border: 1px solid rgba(44, 44, 107, 0.411) !important;
   border-radius: 5px !important;
 }
 

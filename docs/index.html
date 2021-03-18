@@ -61,64 +61,30 @@
 
 
 <!-- Modal -->
-<div  class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-  <div style="background-color: rgb(24, 26, 27) !important; color: white; border-color: brown;" class="modal-dialog" role="document">
-    <div style="border-color: rgb(33, 10, 116);background-color: rgb(24, 26, 27) !important; color: white;" class="modal-content">
-      <div style="border-color: rgb(33, 10, 116)" class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">Controls (Keyboard)</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-
-      <div style="border-color: rgb(24, 26, 27);" class="modal-body">
-        <div class="container">
-          <div class="row">
-            <div class="col-sm">
-              <kbd>WASD</kbd>
-            </div>
-            <div class="col-sm">
-              <kbd>←/→</kbd>
-            </div>
-            <div class="col-sm">
-              <kbd>Shift/X</kbd>
-            </div>
-            <div class="col-sm">
-              <kbd>(QK)E</kbd>
-            </div>
-
-          </div>
-          <hr>
-          <div class="row">
-            <div class="col-sm">
-              <code>Move Arround</code>
-            </div>
-            <div class="col-sm">
-              <code>Rotate Scene</code>
-            </div>
-            <div class="col-sm">
-              <code>Zoom In</code>
-            </div>
-            <div class="col-sm">
-              <code>Accelerate/Decelerate</code>
-            </div>
-
-          </div>
-
+  <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div style="background-color: rgb(21, 24, 26);opacity: 0.9;" class="modal-content">
+        <div style="text-align: center; border-bottom-color: #424242;" class="modal-header ">
+          <h5 style="color: #fff; text-align: center;" class="text-center" id="exampleModalLabel">
+           Keyboard
+          </h5>
+          <button style="color: #fff;" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
-  
-
-
-      </div>
-      <div style="border-color: rgb(126, 129, 129);" class="modal-footer">
-        <button style="width: 100%;" type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+        <div id="controls" class="modal-body">
+          
+        </div>
+        <div style="border-top-color:  #424242;" class="modal-footer">
+          <button style="width: 100%;" type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
+
+
 
     <div style="user-select: none; pointer-events: none;font-family: 'Courier New', Courier, monospace; font-size: 25px; position: absolute; margin-left: 10px; margin-top: 10px; color: white;" id="fps_counter">FPS: 0</div>
-
     <div style="user-select: none; pointer-events: none;font-family: 'Courier New', Courier, monospace; font-size: 25px; position: absolute; right: 50px; margin-top: 10px; color: white;" id="pos_counter">(0, 0)</div>
 
 
@@ -200,7 +166,7 @@
     <div style="margin: 50px;"></div>
 
     <code style="margin-left: 20px; font-weight: 500;">Coloring Algorithms</code>
-    <hr>
+    <hr class="hr">
 
     <div id="PROGRAM_PREVIEW">
 
@@ -210,13 +176,13 @@
     
 
     <code style="margin-left: 20px; font-weight: 500;">Fractals</code>
-    <hr>
+    <hr class="hr">
 
     <!-- Fractal list -->
     <div class="row d-flex justify-content-start" id="fractalList">
 
     </div>
-    <hr>
+    <hr class="hr">
     <select ID="SELECT" style="margin-left: 10px; margin-bottom: 40px;width: 200px; background-color: rgb(24, 26, 27);border-color: rgb(60, 65, 68);color: rgb(233, 74, 147);" class="custom-select">
     </select>
 

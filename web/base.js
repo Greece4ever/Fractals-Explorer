@@ -55,7 +55,7 @@ disableError();
 
     let consoleError = (header, str_err) => {
         
-        err_div.innerHTML += `<pre> <code style="color: rgb(233, 74, 147)">${header}</b><hr> <div style="color: white">${style(str_err)}</div></pre>`
+        err_div.innerHTML += `<pre> <code style="color: rgb(233, 74, 147)">${header}</b><hr class="hr"> <div style="color: white">${style(str_err)}</div></pre>`
     }
 
     let console_ = (str, elm=null) => {

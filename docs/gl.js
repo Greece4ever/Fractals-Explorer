@@ -68,7 +68,7 @@ function attachListeners() {
     })
 
     window.addEventListener("keydown", (e) => {
-        held_keys[e.key.toLowerCase()] = true;
+        held_keys[e.code.toLowerCase().replace("key", "")] = true;
     })
 
     window.addEventListener("keypress", (e) => {
@@ -81,7 +81,7 @@ function attachListeners() {
 
     
     window.addEventListener("keyup", (e) => {
-        held_keys[e.key.toLowerCase()] = false;
+        held_keys[e.code.toLowerCase().replace("key", "")] = false;
     })
 
 
@@ -112,7 +112,7 @@ function attachListeners() {
 
     res_div.addEventListener("touchstart", (e) => {
         e.preventDefault();
-        held_keys["shift"] = true;
+        held_keys["shiftleft"] = true;
 
         let delta = e.target.getBoundingClientRect();
         let touches = e.touches[0];
@@ -132,11 +132,11 @@ function attachListeners() {
                 held_keys["q"] = false;    
             }
             else {
-                held_keys["shift"] = false;
+                held_keys["shiftleft"] = false;
             }
         }
         else {
-            held_keys["shift"] = false;
+            held_keys["shiftleft"] = false;
             held_keys["q"] = false;    
         }
     })
@@ -231,37 +231,36 @@ let FPS_COUNTER = document.getElementById("fps_counter");
 const TWO_PI = Math.PI;
 const FOR_PI = 2 * TWO_PI; 
 
+var velocity;
+var zoomVelocity;
 
-function OrbitControl(timer) {
-    let extraVelocity = 0.0;
+// Triggered when one key is pressed
+let KeyEvents = [
+    ["a", (timer) => offset.x -= velocity * timer.getElapsedTime(), "Move Right"],
+    ["d", (timer) => offset.x += velocity * timer.getElapsedTime(), "Move Left"],
+    ["w", (timer) => offset.y -= velocity * timer.getElapsedTime(), "Move Up"],
+    ["s", (timer) => offset.y += velocity * timer.getElapsedTime(), "Move Down"],
+    ["q", (     ) => offset.zoomVelocity += 500.0, "Accelerate *"],
+    ["e", (     ) => offset.zoomVelocity *= 2, "Accelerate  2x *"],
+    ["r", (     ) => offset.zoomVelocity /= 2, "Deccelerate 2x *"],
 
-    if (isKeyPressed("shift")) {
-        extraVelocity = offset.runVelocity;
-    }
+    ["arrowright", (timer) => {
+        offset.rot += 2 * timer.getElapsedTime();
+        if (offset.rot > FOR_PI) {
+            offset.rot = 0;
+        }
+    }, "Rotate in +Y" ],
+    ["arrowleft", (timer) => {
+        offset.rot -= 2 * timer.getElapsedTime();
+        if (offset.rot < -FOR_PI) {
+            offset.rot = 0;
+        }
+    }, "Rotate in -Y"]
+]
 
-    let velocity = offset.velocity + extraVelocity;
-    let zoomVelocity = offset.zoomVelocity + extraVelocity;
-
-    if (isKeyPressed("a")) {
-        offset.x -= velocity * timer.getElapsedTime();
-    }  
-
-    if (isKeyPressed("d")) {
-        offset.x += velocity * timer.getElapsedTime();
-    }
-
-    if (isKeyPressed("w")) {
-        offset.y -= velocity * timer.getElapsedTime();
-    }
-
-    if (isKeyPressed("s")) {
-        offset.y += velocity * timer.getElapsedTime();
-    }
-
-    let z_pressed = isKeyPressed("shift");
-    let x_pressed = isKeyPressed("x");
-
-    if (z_pressed || x_pressed) {
+// Triggered when either of 2 keys is pressed
+let DoubleKeyEvents = [
+    [ ["shiftleft", "x"], (z_pressed, x_pressed, timer) => {
         let prev_cmpos = toCartesian(mpos.x, mpos.y);
 
         if(z_pressed) 
@@ -283,37 +282,127 @@ function OrbitControl(timer) {
         offset.x = -(-((prev_cmpos.x * offset.zoom) - pX) - mid.x);
         offset.y = -(-(-( prev_cmpos.y * offset.zoom) - pY) - mid.y);
         document.getElementById("zoom").innerText = `${offset.zoom.toExponential(2)}`
+    } ]
+]
+
+function attachControls() {
+    let control = document.getElementById("controls")
+    KeyEvents.forEach(event => {
+        let expr = event[2].replace("*", "<b style='color: red'>*</b>")
+
+        control.innerHTML += `
+        <div  style="width: 90%; margin: auto;font-family: 'Orbitron', sans-serif;" class="row d-flex justify-content-between">
+            <div class="col">
+                <label style="color: #fff">${expr}</label>
+            </div>
+            <div style="pointer-events: none; user-select: none" class="col">
+                <img  style="float: right; width: 32px" src="./key_icons/${event[0].replace("arrow", "")}.svg">
+            </div>
+        </div>
+
+        <hr style="color: #fff; background-color: #424040">
+        `
+    })
+}
+
+
+function OrbitControl(timer) {
+    let extraVelocity = 0.0;
+
+    if (isKeyPressed("shiftleft")) {
+        extraVelocity = offset.runVelocity;
     }
 
+    velocity = offset.velocity + extraVelocity;
+    zoomVelocity = offset.zoomVelocity + extraVelocity;
 
-    if (isKeyPressed("q")) {
-        offset.zoomVelocity += 500.0;
-    }
+    KeyEvents.forEach(event => {
+        if (isKeyPressed(event[0]))
+            event[1](timer);
+    })
 
-    if (isKeyPressed("e")) {
-        offset.zoomVelocity *= 2;
-    }
+    DoubleKeyEvents.forEach(event => {
+
+        let pressed_0 = isKeyPressed(event[0][0]);
+        let pressed_1 = isKeyPressed(event[0][1]);
+        if (pressed_0 || pressed_1)
+            event[1](pressed_0, pressed_1, timer);
+    })
 
 
-    if (isKeyPressed("r")) {
-        offset.zoomVelocity /= 2;
-    }
+    // if (isKeyPressed("a")) {
+    //     offset.x -= velocity * timer.getElapsedTime();
+    // }  
+
+    // if (isKeyPressed("d")) {
+    //     offset.x += velocity * timer.getElapsedTime();
+
+    // }
+    // if (isKeyPressed("w")) {
+    //     offset.y -= velocity * timer.getElapsedTime();
+    // }
+
+    // if (isKeyPressed("s")) {
+    //     offset.y += velocity * timer.getElapsedTime();
+    // }
+
+    // let z_pressed = isKeyPressed("shift");
+    // let x_pressed = isKeyPressed("x");
+
+    // if (z_pressed || x_pressed) {
+    //     let prev_cmpos = toCartesian(mpos.x, mpos.y);
+
+    //     if(z_pressed) 
+    //         offset.zoom += zoomVelocity * timer.getElapsedTime();
+    //     if (x_pressed)
+    //         offset.zoom -= zoomVelocity * timer.getElapsedTime();
+
+    //     // offset.zoomVelocity += 50.0 * timer.getElapsedTime();
+
+    //     if (offset.zoom < 1) {
+    //         offset.zoom = 2;
+    //         offset.zoomVelocity = 100.0;
+    //     }
+
+    //         let pX =  mpos.x;
+    //         let pY =  mpos.y;
+
+
+    //     offset.x = -(-((prev_cmpos.x * offset.zoom) - pX) - mid.x);
+    //     offset.y = -(-(-( prev_cmpos.y * offset.zoom) - pY) - mid.y);
+    //     document.getElementById("zoom").innerText = `${offset.zoom.toExponential(2)}`
+
+    // }
+
+
+    // if (isKeyPressed("q")) {
+    //     offset.zoomVelocity += 500.0;
+    // }
+
+    // if (isKeyPressed("e")) {
+    //     offset.zoomVelocity *= 2;
+    // }
+
+
+    // if (isKeyPressed("r")) {
+    //     offset.zoomVelocity /= 2;
+    // }
 
 
 
-    if (isKeyPressed("arrowright")) {
-        offset.rot += 2 * timer.getElapsedTime();
-        if (offset.rot > FOR_PI) {
-            offset.rot = 0;
-        }
-    }
+    // if (isKeyPressed("arrowright")) {
+    //     offset.rot += 2 * timer.getElapsedTime();
+    //     if (offset.rot > FOR_PI) {
+    //         offset.rot = 0;
+    //     }
+    // }
 
-    if (isKeyPressed("arrowleft")) {
-        offset.rot -= 2 * timer.getElapsedTime();
-        if (offset.rot < -FOR_PI) {
-            offset.rot = 0;
-        }
-    }
+    // if (isKeyPressed("arrowleft")) {
+    //     offset.rot -= 2 * timer.getElapsedTime();
+    //     if (offset.rot < -FOR_PI) {
+    //         offset.rot = 0;
+    //     }
+    // }
 
     selectedProgram.updateCommonUniforms();
 }
@@ -602,9 +691,10 @@ function init() {
 
     canvas.focus();
     attachListeners();
+    attachControls();
     finishLoading();
     timer.restart();    
     fpsTimer.restart();
-    held_keys["shift"] = false;
+    held_keys["shiftleft"] = false;
     loop();
 }

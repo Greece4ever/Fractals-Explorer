@@ -55,7 +55,7 @@ disableError();
 
     let consoleError = (header, str_err) => {
         
-        err_div.innerHTML += `<pre> <code style="color: rgb(233, 74, 147)">${header}</b><hr> <div style="color: white">${style(str_err)}</div></pre>`
+        err_div.innerHTML += `<pre> <code style="color: rgb(233, 74, 147)">${header}</b><hr class="hr"> <div style="color: white">${style(str_err)}</div></pre>`
     }
 
     let console_ = (str, elm=null) => {
@@ -121,8 +121,17 @@ var shaderDIV;
         consoleError("Initialising Context...", `ERROR: Webgl2 Not supported by Browser`);
         setError("It looks like your browser does not support <b style='color: black'>WebGL2</b> and thus this page cannot work . You can find more information <a rel='noreferrer noopener' href='https://get.webgl.org/webgl2/'>here</a>");
     }
-    else 
-        consoleError("Initialising Context...", `SUCCESS: Initialised Webgl2 Context`)
+    else {
+        let elms = `
+ [INFO] WebGL Version: ${gl.getParameter(gl.VERSION)}
+ [INFO] GLSL  Version: ${gl.getParameter(gl.SHADING_LANGUAGE_VERSION)}
+ [INFO] WebGL Vendor:  ${gl.getParameter(gl.VENDOR)}
+
+        `;
+
+        consoleError("Initialising Context...", `SUCCESS: Initialised Webgl2 Context` + elms)
+
+    }
 
     shaderDIV = consoleError("Loading Shaders...", "");
     err_div.innerHTML += "<pre id=\"console0\"></pre>";
