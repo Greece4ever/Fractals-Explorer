@@ -1,6 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
 
+
+.full_scren_btn {
+  position: absolute;
+  left: 0; 
+  bottom: 0; 
+  margin-left: 10px;
+  margin-bottom: 10px; 
+  background-color: #1a1a1c8a;
+  color: #fff;
+}
+
+.full_scren_btn:hover {
+  background-color: #7171798a;
+}
+
 .hr {
   border: 1px solid rgba(44, 44, 107, 0.411) !important;
   border-radius: 5px !important;
@@ -227,7 +242,3 @@ input[type="color"] {
 .tooltip {
   pointer-events: none;  
 }
-
-
-
-

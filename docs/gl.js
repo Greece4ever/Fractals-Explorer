@@ -1,3 +1,5 @@
+let zoomElement = document.getElementById("zoom");
+
 function glCall(line) {
     let error = gl.getError();
     let status = "ERROR";
@@ -17,6 +19,59 @@ function reset() {
     offset.y = 0.0;
     offset.rot = 0.0;
 }
+
+let mouseDown = false;
+
+const onMouseMove = (e) =>
+{
+    let delta = e.target.getBoundingClientRect();
+
+    let prev_X = mpos.x;
+    let prev_Y = mpos.y;
+
+    mpos.x = e.clientX - delta.x;
+    mpos.y = e.clientY - delta.y;
+
+    if (!mouseDown)
+        return;
+
+    let dx = (mpos.x - prev_X);
+    let dy = (mpos.y - prev_Y);
+
+    offset.x -= dx;
+    offset.y -= dy;
+}
+
+function closeFullscreen() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) { /* Safari */
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { /* IE11 */
+      document.msExitFullscreen();
+    }
+} 
+
+function enableFullScreen(but_full)
+{
+    resizeCanvas(screen.width, screen.height);
+    
+    res_div.style.resize = "none";
+    resizeCanvas(screen.width, screen.height);
+    document.body.requestFullscreen();
+    setTimeout(() => {
+        resizeCanvas(screen.width, screen.height);
+    }, 100)
+    
+    if (but_full)
+    {
+        but_full[0].style.visibility = "hidden";
+        but_full[1].style.visibility = "visible";
+    
+    }
+}
+
+let isFullScreen = false;
 
 function attachListeners() {
     // NOTE -> BUG: window.ondevicemotion works only when the page is served via HTTPS
@@ -84,12 +139,42 @@ function attachListeners() {
         held_keys[e.code.toLowerCase().replace("key", "")] = false;
     })
 
+    res_div.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        mouseDown = true;
+    })
+
+
+    res_div.addEventListener("mouseup", () => {
+        mouseDown = false;
+    })
+
+    res_div.addEventListener("mouseleave", () => {
+        if (!isFullScreen)
+            mouseDown = false;
+    })
+
+
+    canvas.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        mouseDown = true;
+    })
+
+    canvas.addEventListener("mouseup", (e) => {
+        mouseDown = false;
+    })
+
+
+    window.addEventListener("mouseleave", () => {
+        mouseDown = false;
+    })
 
     res_div.addEventListener("mousemove", (e) => {
-        let delta = e.target.getBoundingClientRect();
-        mpos.x = e.clientX - delta.x;
-        mpos.y = e.clientY - delta.y;
-        
+        onMouseMove(e);
+    })
+
+    canvas.addEventListener("mousemove", (e) => {
+        onMouseMove(e);
     })
 
     res_div.addEventListener("touchmove", (e) => {
@@ -156,19 +241,76 @@ function attachListeners() {
         }
     })
 
+    let but_full = document.getElementsByClassName("full_scren_btn");
+
+    if (but_full.length == 2)
+    {
+        but_full[0].style.visibility = "visible";
+        but_full[1].style.visibility = "hidden";
+
+        but_full[0].addEventListener("click", () => {
+            enableFullScreen(but_full);
+        })    
+
+        but_full[1].addEventListener("click", () => {
+            closeFullscreen();
+            but_full[0].style.visibility = "visible";
+            but_full[1].style.visibility = "hidden";
+        })        
+    }
+
+
     res_div.addEventListener("contextmenu", (e) => {
         e.preventDefault();
-
-        resizeCanvas(screen.width, screen.height);
-
-        res_div.style.resize = "none";
-        resizeCanvas(screen.width, screen.height);
-        document.body.requestFullscreen();
-        setTimeout(() => {
-            resizeCanvas(screen.width, screen.height);
-        }, 100)
+        enableFullScreen(but_full);
     })
     
+    document.body.addEventListener("fullscreenchange", (e) => {
+        isFullScreen = document.fullscreenElement == e.target;
+        if (!isFullScreen)
+        {
+            // console.log("not fullscren")
+            but_full[0].style.visibility = "visible";
+            but_full[1].style.visibility = "hidden";
+        }
+    })
+
+    function zoomInto(delta) {
+        let count = 0;
+        let interval = setInterval(() => {
+            if (count === 20)
+                clearInterval(interval);
+
+                let prev_cmpos = toCartesian(mpos.x, mpos.y);
+
+                offset.zoom += zoomVelocity * delta * timer.getElapsedTime();
+        
+                if (offset.zoom < 1) {
+                    offset.zoom = 2;
+                    offset.zoomVelocity = 100.0;
+                }
+        
+                let pX =  mpos.x;
+                let pY =  mpos.y;
+        
+                offset.x = -(-((prev_cmpos.x * offset.zoom) - pX) - mid.x);
+                offset.y = -(-(-( prev_cmpos.y * offset.zoom) - pY) - mid.y);
+            count++;
+            zoomElement.innerText = `${offset.zoom.toExponential(2)}`
+        }, 10)
+    }
+
+    
+    res_div.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        zoomInto(-e.deltaY)
+    })
+
+    // For fullscreen
+    canvas.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        zoomInto(-e.deltaY)
+    })
 
 }
 
@@ -268,8 +410,6 @@ let DoubleKeyEvents = [
         if (x_pressed)
             offset.zoom -= zoomVelocity * timer.getElapsedTime();
 
-        // offset.zoomVelocity += 50.0 * timer.getElapsedTime();
-
         if (offset.zoom < 1) {
             offset.zoom = 2;
             offset.zoomVelocity = 100.0;
@@ -281,28 +421,63 @@ let DoubleKeyEvents = [
 
         offset.x = -(-((prev_cmpos.x * offset.zoom) - pX) - mid.x);
         offset.y = -(-(-( prev_cmpos.y * offset.zoom) - pY) - mid.y);
-        document.getElementById("zoom").innerText = `${offset.zoom.toExponential(2)}`
-    } ]
+        zoomElement.innerText = `${offset.zoom.toExponential(2)}`
+    }, "Zoom In/Out" ]
 ]
+
+function keyTemplate(left, right)
+{
+    return (`
+    <div  style="width: 90%; margin: auto;font-family: 'Orbitron', sans-serif;" class="row d-flex justify-content-between">
+        <div class="col">
+            <label style="color: #fff">${left}</label>
+        </div>
+        <div style="pointer-events: none; user-select: none; color: #fff" class="col">
+            ${right}
+        </div>
+    </div>
+
+    <hr style="color: #fff; background-color: #424040">
+    `)
+}
+
 
 function attachControls() {
     let control = document.getElementById("controls")
     KeyEvents.forEach(event => {
         let expr = event[2].replace("*", "<b style='color: red'>*</b>")
+        control.innerHTML += keyTemplate(expr, `<img  style="float: right; width: 32px" src="./key_icons/${event[0].replace("arrow", "")}.svg">`)
+    })
 
+    control.innerHTML += keyTemplate("Reset", `<img  style="float: right; width: 32px" src="./key_icons/enter.svg">`)
+
+    DoubleKeyEvents.forEach(event => {
+        console.log("--->", event)
+        let expr = event[2].replace("*", "<b style='color: red'>*</b>")
         control.innerHTML += `
         <div  style="width: 90%; margin: auto;font-family: 'Orbitron', sans-serif;" class="row d-flex justify-content-between">
             <div class="col">
                 <label style="color: #fff">${expr}</label>
             </div>
-            <div style="pointer-events: none; user-select: none" class="col">
-                <img  style="float: right; width: 32px" src="./key_icons/${event[0].replace("arrow", "")}.svg">
+            <div style="pointer-events: none; user-select: none; float: right" class="col">
+            <img  style="width: 64px" src="./key_icons/${event[0][0]}.svg">
+
+                    <svg style='width: 40px; height: 40px;'>
+                    <line x1="0" y1="40" x2="40" y2="0"
+                        style="stroke:rgb(69, 68, 66);stroke-width:2"/>
+                    </svg>
+
+            <img  style="width: 32px" src="./key_icons/${event[0][1]}.svg">
+
             </div>
         </div>
-
-        <hr style="color: #fff; background-color: #424040">
-        `
+        <hr style="color: #fff; background-color: #424040">    
+    `    
     })
+
+
+    control.innerHTML += keyTemplate("Move Arround", "Move Mouse with left pressed");
+    control.innerHTML += keyTemplate("Zoom In/out", "Scroll Wheel");
 }
 
 
@@ -329,80 +504,6 @@ function OrbitControl(timer) {
             event[1](pressed_0, pressed_1, timer);
     })
 
-
-    // if (isKeyPressed("a")) {
-    //     offset.x -= velocity * timer.getElapsedTime();
-    // }  
-
-    // if (isKeyPressed("d")) {
-    //     offset.x += velocity * timer.getElapsedTime();
-
-    // }
-    // if (isKeyPressed("w")) {
-    //     offset.y -= velocity * timer.getElapsedTime();
-    // }
-
-    // if (isKeyPressed("s")) {
-    //     offset.y += velocity * timer.getElapsedTime();
-    // }
-
-    // let z_pressed = isKeyPressed("shift");
-    // let x_pressed = isKeyPressed("x");
-
-    // if (z_pressed || x_pressed) {
-    //     let prev_cmpos = toCartesian(mpos.x, mpos.y);
-
-    //     if(z_pressed) 
-    //         offset.zoom += zoomVelocity * timer.getElapsedTime();
-    //     if (x_pressed)
-    //         offset.zoom -= zoomVelocity * timer.getElapsedTime();
-
-    //     // offset.zoomVelocity += 50.0 * timer.getElapsedTime();
-
-    //     if (offset.zoom < 1) {
-    //         offset.zoom = 2;
-    //         offset.zoomVelocity = 100.0;
-    //     }
-
-    //         let pX =  mpos.x;
-    //         let pY =  mpos.y;
-
-
-    //     offset.x = -(-((prev_cmpos.x * offset.zoom) - pX) - mid.x);
-    //     offset.y = -(-(-( prev_cmpos.y * offset.zoom) - pY) - mid.y);
-    //     document.getElementById("zoom").innerText = `${offset.zoom.toExponential(2)}`
-
-    // }
-
-
-    // if (isKeyPressed("q")) {
-    //     offset.zoomVelocity += 500.0;
-    // }
-
-    // if (isKeyPressed("e")) {
-    //     offset.zoomVelocity *= 2;
-    // }
-
-
-    // if (isKeyPressed("r")) {
-    //     offset.zoomVelocity /= 2;
-    // }
-
-
-
-    // if (isKeyPressed("arrowright")) {
-    //     offset.rot += 2 * timer.getElapsedTime();
-    //     if (offset.rot > FOR_PI) {
-    //         offset.rot = 0;
-    //     }
-    // }
-
-    // if (isKeyPressed("arrowleft")) {
-    //     offset.rot -= 2 * timer.getElapsedTime();
-    //     if (offset.rot < -FOR_PI) {
-    //         offset.rot = 0;
-    //     }
-    // }
 
     selectedProgram.updateCommonUniforms();
 }

@@ -84,6 +84,7 @@
 
 
 
+
     <div style="user-select: none; pointer-events: none;font-family: 'Courier New', Courier, monospace; font-size: 25px; position: absolute; margin-left: 10px; margin-top: 10px; color: white;" id="fps_counter">FPS: 0</div>
     <div style="user-select: none; pointer-events: none;font-family: 'Courier New', Courier, monospace; font-size: 25px; position: absolute; right: 50px; margin-top: 10px; color: white;" id="pos_counter">(0, 0)</div>
 
@@ -91,6 +92,12 @@
 
 
     <div id="res_div" style="overflow: auto; position: absolute;width: 800px; height: 600px; resize: horizontal; background-color: transparent">
+      <button class="btn full_scren_btn">
+      <svg  xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707zm0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707zm-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707z"/>
+      </svg>
+      </button>
+
     </div>
 
 
@@ -122,7 +129,15 @@
           It seems like your browser does not support the HTML canvas element.
           You can find the list of supported browsers <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#browser_compatibility">here</a>.
         </div>  
-      </canvas>  
+      </canvas>
+
+      <button class="btn full_scren_btn">
+        <svg  xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707zm0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707zm-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707z"/>
+        </svg>
+      </button>
+  
+      
     </div>
 
     <div class="d-flex" id="mobile">

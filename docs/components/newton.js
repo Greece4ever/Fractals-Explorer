@@ -40,7 +40,6 @@ newton_exports["function"] = function(program) {
     let COLORS = [[154 , 93, 93], [109 , 167, 109], [99 , 129, 159], [255, 255, 255] ];
     let btn_names = ["Enable Smoothing", "Swap Opacity"]
 
-    console.log(id);
     let COL_PARENT = document.getElementById(`peos${id}`);
     let CAN_PARENT = document.getElementById(`newton_canvas${id}`); CAN_PARENT.style.position = "relative";
     let BUT_PARENT = document.getElementById(`button_parent${id}`);

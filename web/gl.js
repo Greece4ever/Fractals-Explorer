@@ -92,6 +92,22 @@ function attachListeners() {
         
     })
 
+    function zoomInto(delta) {
+        let count = 0;
+        let interval = setInterval(() => {
+            if (count === 10)
+                clearInterval(interval);
+            offset.zoom += 100 * delta * timer.getElapsedTime();
+            count++;
+        }, 10)
+    }
+
+    
+    res_div.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        zoomInto(-e.deltaY)
+    })
+
     res_div.addEventListener("touchmove", (e) => {
         let delta = e.target.getBoundingClientRect();
         let touches = e.touches[0];
